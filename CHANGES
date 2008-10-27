@@ -1,0 +1,16 @@
+
+
+
+              CHANGES IN `sda' PACKAGE VERSION 1.0.0
+
+
+This package implements LDA and DDA classification,
+where the training of the classifier is done via Stein-type
+shrinkage of frequencies, variances, and correlation.
+
+This approach is particularly suitable for high-dimensional 
+classification.
+
+
+This is the first public release (27 October 2008).
+
