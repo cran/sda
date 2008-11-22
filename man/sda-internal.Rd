@@ -1,6 +1,7 @@
 \name{sda-internal}
 
-\alias{convert2probs}
+\alias{score2prob}
+\alias{pvt.groups}
 
 \title{Internal sda functions}
 \description{

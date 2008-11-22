@@ -24,7 +24,7 @@ This approach is particularly suited for high-dimensional classification.
 \references{
   See website: \url{http://strimmerlab.org/software/sda/}
 }
-\keyword{univar}
+\keyword{multivariate}
 \seealso{
 \code{\link{sda}, \link{predict.sda}}
 }

@@ -1,4 +1,4 @@
-### predict.sda.R  (2008-10-26)
+### predict.sda.R  (2008-11-15)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
@@ -40,13 +40,13 @@ predict.sda = function(object, Xtest, ...)
   nt = nrow(Xtest)
   clcount = length(freq)
 
-  if( is.vector(iS) )
-    diagonal=TRUE
+  if( is.null(dim(iS)) )
+    diagonal = TRUE
   else
     diagonal = FALSE
 
   probs = array(0, dim=c(nt, clcount) )
-  scores = numeric(clcount) 
+  score = numeric(clcount) 
   yhat = integer(nt)
   for (i in 1:nt)
   {
@@ -55,16 +55,17 @@ predict.sda = function(object, Xtest, ...)
     {
        if (diagonal)
        {
-         scores[k] = sum((-2*m[,k]*x+m[,k]^2)*iS) -2*log(freq[k])
+         tmp = m[,k]*iS
+         score[k] = sum( tmp*x -0.5*tmp*m[,k] ) + log(freq[k])
        }
        else
        {
-         tmp = t(m[,k]) %*% iS
-         scores[k] = -2*tmp %*% x + tmp %*% m[,k] -2*log(freq[k])
+         tmp = crossprod(iS, m[,k])
+         score[k] = crossprod(tmp, x) -0.5*crossprod(tmp, m[,k]) + log(freq[k])
        }
     }
-    probs[i,] = convert2probs(scores)
-    yhat[i] = which.min(scores)
+    probs[i,] = score2prob(score)
+    yhat[i] = which.max(score)
   }
   probs = zapsmall(probs)
   attr(yhat, "levels") = names(freq)
@@ -75,10 +76,10 @@ predict.sda = function(object, Xtest, ...)
   return(list(yhat=yhat, probs=probs) )
 }
 
-convert2probs = function(x)
+score2prob = function(x)
 {
    x = x-max(x)
-   x = exp(-1/2*x)
+   x = exp(x)
    x = x/sum(x)
 
    return(x)

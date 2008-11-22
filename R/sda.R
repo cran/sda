@@ -1,6 +1,6 @@
-### sda.R  (2008-10-26)
+### sda.R  (2008-11-20)
 ###
-###    Shrinkage discriminant analysis (training)
+###    Shrinkage discriminant analysis (training the classifier)
 ###
 ### Copyright 2008 Korbinian Strimmer
 ###
@@ -24,59 +24,49 @@
 
 sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
 {
-   p = ncol(Xtrain)
-   n = nrow(Xtrain)
-   
-   y = factor(L)
-   if (length(y) != n) stop("for each sample there must be a class label!")
-   cl = levels(y)
-   clcount = length(cl)
+   if (missing(L)) stop("Class labels are missing!")
 
    # shrinkage intensities
    regularization = rep(NA, 3)
    names(regularization) = c("lambda.freqs", "lambda.var", "lambda")
-   
+
+   # centroids, variances and inverse correlation matrix
+   tmp = centroids(Xtrain, L, var.pooled=TRUE, var.groups=FALSE, 
+            invcor.pooled=TRUE, shrink=TRUE, verbose=verbose)
 
    # class frequencies
-   f = freqs.shrink( table(y), verbose=verbose )
-   prior = numeric(clcount)
-   names(prior) = cl
-   for (k in 1:clcount) prior[k] = f[cl[k]]
-   regularization[1] = attr(f, "lambda.freqs")
+   prior = freqs.shrink( tmp$samples, verbose=verbose )
+   regularization[1] = attr(prior, "lambda.freqs")
+   attr(prior, "lambda.freqs") = NULL
    
    # means
-   mu = array(NA, dim=c(p, clcount))
-   colnames(mu) = cl
-   rownames(mu) = colnames(Xtrain)
-   Xc = array(0, dim=c(n,p))  # centered data
-   colnames(Xc) = colnames(Xtrain)
-   for (k in 1:clcount)
-   {
-      idx = ( y == cl[k] )
-      Xk = Xtrain[idx,]
-      mu[,k] = apply(Xk, 2, mean)
-      Xc[idx,] = sweep(Xk, 2, mu[,k]) # center data
-   }
- 
+   mu = tmp$means
+   
    if (diagonal)
    {
-      invvar = 1/var.shrink(Xc, verbose=verbose) *(n-clcount)/(n-1)
-      regularization[2] = attr(invvar, "lambda.var")
+      regularization[2] = attr(tmp$var.pooled, "lambda.var")
       regularization[3] = 1
-      invS = invvar
+
+      invS  = 1/tmp$var.pooled
+
+      attr(invS, "lambda.var") = NULL
    }
    else
    {
-     invS = invcov.shrink(Xc, verbose=verbose)*(n-clcount)/(n-1)
-     regularization[2] = attr(invS, "lambda.var")
+     sc = sqrt( tmp$var.pooled )
+     invS = tmp$invcor.pooled
+
+     regularization[2] = attr(sc, "lambda.var")
      regularization[3] = attr(invS, "lambda")
-     attr(invS,"lambda") = NULL
-     attr(invS,"lambda.estimated") = NULL
+
+     if (is.null(dim(invS)))
+       invS = invS/sc/sc
+     else
+       invS = sweep(sweep(invS, 1, 1/sc, "*"), 2, 1/sc, "*")
+
+     attr(invS, "lambda") = NULL
    }
-   attr(invS,"lambda.var") = NULL
-   attr(invS,"lambda.var.estimated") = NULL
-   class(invS) = NULL
-  
+   
    out = list(regularization=regularization, prior=prior, means=mu, invcov=invS)
    class(out)="sda"
 

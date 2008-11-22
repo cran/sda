@@ -1,0 +1,27 @@
+
+              RELEASE HISTORY OF THE "sda" PACKAGE
+            ========================================
+
+
+              CHANGES IN `sda' PACKAGE VERSION 1.0.1 
+
+- new centroids() function to compute group-wise centroids,
+  (pooled variances), and inverse pooled correlations. 
+- uses the "collapse" option in corpcor >= 1.4.8 to save
+  memory when estimated correlation is diagonal (effectively
+  turning LDA into DDA if the estimated shrinkage intensity lambda=1).
+
+
+              CHANGES IN `sda' PACKAGE VERSION 1.0.0
+
+
+This package implements LDA and DDA classification,
+where the training of the classifier is done via Stein-type
+shrinkage of frequencies, variances, and correlation.
+
+This approach is particularly suitable for high-dimensional 
+classification.
+
+
+This is the first public release (27 October 2008).
+

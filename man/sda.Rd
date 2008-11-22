@@ -2,7 +2,7 @@
 \alias{sda}
 \alias{predict.sda}
 
-\title{Shrinkage discriminant analysis}
+\title{Shrinkage Discriminant Analysis}
 
 \usage{
 sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
@@ -18,11 +18,11 @@ sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
   \item{Xtrain}{A matrix  containing the training data set. Note that 
                 the rows are sample observations and the columns
                 are variables.}
-  \item{L}{A factor with the class labels of the traning samples. }
+  \item{L}{A factor with the class labels of the training samples. }
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
   \item{verbose}{Report shrinkage intensities.}
   \item{object}{An \code{sda} fit object obtained from the function \code{sda}.}
-  \item{Xtest}{A matrix containing the test data set..}
+  \item{Xtest}{A matrix containing the test data set.}
   \item{...}{Additional arguments for generic predict.}
 }
 \details{
@@ -100,4 +100,4 @@ predict(sda.fit, test.x)
 ynew = predict(sda.fit, test.x)$yhat
 sum(ynew != test.y)
 }
-\keyword{univar}
+\keyword{multivariate}
