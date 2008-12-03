@@ -6,7 +6,7 @@
 
 \usage{
 sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
-\method{predict}{sda}(object, Xtest, ...)
+\method{predict}{sda}(object, Xtest, feature.idx, verbose=TRUE, ...)
 }
 \description{
   \code{rda} trains a LDA or DDA classifier using Stein-type shrinkage estimation.
@@ -20,12 +20,16 @@ sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
                 are variables.}
   \item{L}{A factor with the class labels of the training samples. }
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
-  \item{verbose}{Report shrinkage intensities.}
+  \item{verbose}{Report shrinkage intensities (sda) and number of used features (predict.sda).}
   \item{object}{An \code{sda} fit object obtained from the function \code{sda}.}
   \item{Xtest}{A matrix containing the test data set.}
+  \item{feature.idx}{A vector indicating which features to employ for prediction (if unspecified all
+                     features will be used).}
   \item{...}{Additional arguments for generic predict.}
 }
 \details{
+The SDA approach is particularly suited for high-dimensional classification.
+
 In order to train the LDA or DDA classifier, three separate shrinkage estimators are employed:
 
 \item{class frequencies}{ the  estimator \code{\link[entropy:entropy.shrink]{freqs.shrink}} 
@@ -37,24 +41,21 @@ In order to train the LDA or DDA classifier, three separate shrinkage estimators
 These estimates are plugged into the LDA and DDA discriminant
 function for prediction.  Note that the three corresponding regularization parameters
 are obtained analytically without resorting to computer intensive resampling.
-
-This approach is particularly suited for high-dimensional classification.
 }
 \value{
   \code{sda} trains the classifier and returns an \code{sda} object
-  with the following components:
+  with the following components needed for the subsequent prediction:
 
   \item{regularization}{a vector containing the three estimated shrinkage intensities,}
    \item{prior}{the estimated class frequencies,}
-   \item{means}{a matrix containing the group means (centroids), and}
-   \item{invcov}{the inverse of the estimated pooled covariance matrix (this is a matrix in the LDA and
-    a vector in the DDA case).}
+   \item{ref}{matrix containing the reference centroids, }
+   \item{coef}{matrix containing the coefficients used for prediction, and}
+   \item{cat}{matrix containing the ``correlation-adjusted t scores'' for each feature and group.}
 
    \code{predict.sda} predicts class probabilities for each test sample and returns
    a list with two components:
-  \item{yhat}{a factor with the the most likely class assignment, and}
-   \item{probs}{a matrix containing the class probabilities for each test sample.}
-
+  \item{class}{a factor with the most probable class assignment, and}
+   \item{posterior}{a matrix containing the class posterior probabilities for each test sample.}
 }
 
 
@@ -66,38 +67,35 @@ This approach is particularly suited for high-dimensional classification.
 \code{\link[corpcor:invcov.shrink]{invcor.shrink}}.}
 
 \examples{
+# load sda library
 library("sda")
 
-## prepare data set
-data(iris) # good old iris data
-X = as.matrix(iris[,1:4])
-Y = iris[,5]
+# load full Khan et al (2001) data set
+data(khan2001)
+dim(khan2001$x)
+levels(khan2001$y)
 
-# divide into test and traing data set
-tr.index = sample(1:length(Y), 2/3*length(Y))
-train.x = X[tr.index,]                     
-train.y = Y[tr.index]
-test.x = X[-tr.index,] 
-test.y = Y[-tr.index]
+# create data set containing only the SRBCT samples
+del.idx = which( khan2001$y == "non-SRBCT" )
+srbct.x = khan2001$x[-del.idx,]
+srbct.y = factor(khan2001$y[-del.idx])
+dim(srbct.x)
+levels(srbct.y)
 
+# divide into training and test data
+train.x = srbct.x[1:63,]
+train.y = srbct.y[1:63]
+test.x = srbct.x[64:83,]
+test.y = srbct.y[64:83]
 
-## shrinkage LDA
-sda.fit = sda(Xtrain=train.x, L=train.y)
-sda.fit
+# classification with correlation (shrinkage LDA)
+sda.fit = sda(train.x, train.y)
+ynew = predict(sda.fit, test.x)$class
+sum(ynew != test.y) # 0
 
-predict(sda.fit, test.x)
-
-ynew = predict(sda.fit, test.x)$yhat
-sum(ynew != test.y)
-
-
-## shrinkage DDA
-sda.fit = sda(Xtrain=train.x, L=train.y, diagonal=TRUE)
-sda.fit
-
-predict(sda.fit, test.x)
-
-ynew = predict(sda.fit, test.x)$yhat
-sum(ynew != test.y)
+# classification with diagonal covariance (shrinkage DDA)
+sda.fit = sda(train.x, train.y, diagonal=TRUE)
+ynew = predict(sda.fit, test.x)$class
+sum(ynew != test.y) # 4
 }
 \keyword{multivariate}

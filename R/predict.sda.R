@@ -1,4 +1,4 @@
-### predict.sda.R  (2008-11-15)
+### predict.sda.R  (2008-12-01)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
@@ -24,7 +24,7 @@
 
 
 
-predict.sda = function(object, Xtest, ...)
+predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
 {
   if ( missing(object) ) {
     stop("A sda fit object must be supplied.")
@@ -34,35 +34,28 @@ predict.sda = function(object, Xtest, ...)
     stop("A new data to predict must be supplied.")
   }
 
-  m = object$means
+  if (missing(feature.idx)) feature.idx = 1:nrow(object$cat)
+  
+  Xtest = as.matrix(Xtest)
+  ntest = nrow(Xtest)
   freq = object$prior
-  iS = object$invcov
-  nt = nrow(Xtest)
-  clcount = length(freq)
+  cl.count = length(freq)
 
-  if( is.null(dim(iS)) )
-    diagonal = TRUE
-  else
-    diagonal = FALSE
+  probs = array(0, dim=c(ntest, cl.count) )
+  score = numeric(cl.count) 
+  yhat = integer(ntest)
 
-  probs = array(0, dim=c(nt, clcount) )
-  score = numeric(clcount) 
-  yhat = integer(nt)
-  for (i in 1:nt)
+  pw = object$coef[feature.idx, , drop=FALSE]
+  ref = object$ref[feature.idx, , drop=FALSE]
+
+  if (verbose) cat("Prediction uses", nrow(pw), "features.\n")
+
+  for (i in 1:ntest)
   {
-    x = t(Xtest[i,,drop=FALSE])  # p x 1
-    for (k in 1:clcount)
+    xs = Xtest[i, feature.idx]  # test sample
+    for (k in 1:cl.count)
     {
-       if (diagonal)
-       {
-         tmp = m[,k]*iS
-         score[k] = sum( tmp*x -0.5*tmp*m[,k] ) + log(freq[k])
-       }
-       else
-       {
-         tmp = crossprod(iS, m[,k])
-         score[k] = crossprod(tmp, x) -0.5*crossprod(tmp, m[,k]) + log(freq[k])
-       }
+       score[k] = crossprod(pw[, k], xs - ref[, k]) + log(freq[k])
     }
     probs[i,] = score2prob(score)
     yhat[i] = which.max(score)
@@ -73,7 +66,7 @@ predict.sda = function(object, Xtest, ...)
   colnames(probs) = names(freq)
   rownames(probs) = rownames(Xtest)
 
-  return(list(yhat=yhat, probs=probs) )
+  return(list(class=yhat, posterior=probs) )
 }
 
 score2prob = function(x)

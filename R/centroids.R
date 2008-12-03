@@ -1,6 +1,6 @@
-### centroids.R  (2008-11-20)
+### centroids.R  (2008-12-01)
 ###
-###    Group centroids, variances and inverse correlation matrix
+###    Group centroids, variances, and correlations
 ###
 ### Copyright 2008 Korbinian Strimmer
 ###
@@ -23,8 +23,8 @@
 
 
 
-centroids = function(x, L, var.pooled=TRUE, var.groups=FALSE, invcor.pooled=FALSE, 
-  shrink=FALSE, verbose=TRUE)
+centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE, 
+  var.groups=FALSE, powcor.pooled=FALSE, alpha=1, shrink=FALSE, verbose=TRUE)
 {
   p = ncol(x)
   n = nrow(x)
@@ -36,14 +36,14 @@ centroids = function(x, L, var.pooled=TRUE, var.groups=FALSE, invcor.pooled=FALS
   cl.count = groups$cl.count
   cl.names = groups$cl.names
 
-  if (verbose) cat("Number of class labels: ", cl.count, "\n")
+  if (verbose) cat("Number of class labels: ", cl.count, "\n\n")
 
   # means
-  mu = array(NA, dim=c(p, cl.count))
+  mu = array(0, dim=c(p, cl.count))
   colnames(mu) = cl.names
   rownames(mu) = colnames(x)
  
-  if(var.pooled)
+  if(var.pooled || powcor.pooled)
   {
      xc = array(0, dim=c(n,p))  # storage for centered data
      #colnames(xc) = colnames(x)
@@ -68,7 +68,7 @@ centroids = function(x, L, var.pooled=TRUE, var.groups=FALSE, invcor.pooled=FALS
      Xk = x[ idx, ,drop = FALSE]
      mu[,k] = colMeans(Xk)
 
-     if(var.pooled)
+     if(var.pooled || powcor.pooled)
        xc[idx,] = sweep(Xk, 2, mu[,k]) # center data
 
      if (var.groups)
@@ -109,33 +109,50 @@ centroids = function(x, L, var.pooled=TRUE, var.groups=FALSE, invcor.pooled=FALS
     v.pool = NULL
   }
   
-  if (invcor.pooled == TRUE)
+  if (powcor.pooled)
   {
-    if (verbose) cat("Estimating inverse correlation matrix (pooled across classes)\n")
+    if (verbose)
+    {
+       if (alpha==1)
+         cat("Estimating correlation matrix (pooled across classes)\n")
+       else if (alpha==-1)
+         cat("Estimating inverse correlation matrix (pooled across classes)\n")
+       else
+         cat("Estimating correlation matrix to the power of", alpha, "(pooled across classes)\n")
+    }
 
     if (shrink)
     {
-      ic = invcor.shrink(xc, collapse=TRUE, verbose=verbose)
+      powr = powcor.shrink(xc, alpha=alpha, collapse=TRUE, verbose=verbose)
     }
     else
     {
-      ic = invcor.shrink(xc, lambda=0, collapse=TRUE, verbose=FALSE)
-      attr(ic, "lambda") = NULL
+      powr = powcor.shrink(xc, alpha=alpha, lambda=0, collapse=TRUE, verbose=FALSE)
+      attr(powr, "lambda") = NULL
     }
-    attr(ic, "class") = NULL
-    attr(ic, "lambda.estimated") = NULL      
+    attr(powr, "class") = NULL
+    attr(powr, "lambda.estimated") = NULL      
 
-    # note there is no correction factor for (inverse) correlation
-    colnames(ic) = colnames(x)
-    rownames(ic) = colnames(x)
+    # note there is no correction factor for correlation
+    colnames(powr) = colnames(x)
+    rownames(powr) = colnames(x)
   }
   else
   {
-    ic = NULL
+    powr = NULL
   }
 
+  if (mean.pooled)
+  {
+    mu.pooled = colMeans(x)
+  }
+  else
+  {
+    mu.pooled = NULL
+  }
 
-  return( list(samples=samples, means=mu, var.pooled=v.pool, var.groups=v, invcor.pooled=ic))
+  return( list(samples=samples, means=mu, mean.pooled=mu.pooled, 
+    var.pooled=v.pool, var.groups=v, powcor.pooled=powr, alpha=alpha))
 }
 
 

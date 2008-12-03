@@ -9,7 +9,7 @@ where the classifier is trained using Stein-type shrinkage estimators.
 
 Specifically, three separate shrinkage estimators are employed for the
 
-\item{class frequencies}{following Hausser and Strimmer(2008),} 
+\item{class frequencies}{following Hausser and Strimmer (2008),} 
 \item{variances}{following Opgen-Rhein and Strimmer (2007), and}
 \item{correlations}{following Sch\"afer and Strimmer (2005).} 
 
