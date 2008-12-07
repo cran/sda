@@ -3,6 +3,15 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.0.3 
+
+- sda() now provides ranking of features.
+- fdr values can optionally be computed for each feature.
+- centroids() now reports number of samples and features.
+- sda() function has been rewritten, and a bug introduced in 
+  version 1.0.2 has been corrected.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.0.2 
 
 - predict.sda() is now very much faster, and the object returned

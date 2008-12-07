@@ -1,4 +1,4 @@
-### centroids.R  (2008-12-01)
+### centroids.R  (2008-12-04)
 ###
 ###    Group centroids, variances, and correlations
 ###
@@ -36,7 +36,12 @@ centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE,
   cl.count = groups$cl.count
   cl.names = groups$cl.names
 
-  if (verbose) cat("Number of class labels: ", cl.count, "\n\n")
+  if (verbose)
+  {
+    cat("Number of variables:", p, "\n")
+    cat("Number of observations:", n, "\n")
+    cat("Number of classes:", cl.count, "\n\n")
+  }
 
   # means
   mu = array(0, dim=c(p, cl.count))

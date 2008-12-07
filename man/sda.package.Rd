@@ -20,7 +20,7 @@ are obtained analytically without resorting to computer intensive resampling.
 This approach is particularly suited for high-dimensional classification.
 }
 
-\author{Korbinian Strimmer (\url{http://strimmerlab.org/})}
+\author{Miika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org/})}
 \references{
   See website: \url{http://strimmerlab.org/software/sda/}
 }

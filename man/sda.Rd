@@ -4,14 +4,15 @@
 
 \title{Shrinkage Discriminant Analysis}
 
-\usage{
-sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
-\method{predict}{sda}(object, Xtest, feature.idx, verbose=TRUE, ...)
-}
 \description{
-  \code{rda} trains a LDA or DDA classifier using Stein-type shrinkage estimation.
+  \code{sda} trains a LDA or DDA classifier using Stein-type shrinkage estimation.
  
   \code{predict.sda} performs the corresponding class prediction.
+}
+
+\usage{
+sda(Xtrain, L, diagonal=FALSE, fdr=FALSE, plot.fdr=FALSE, verbose=TRUE)
+\method{predict}{sda}(object, Xtest, feature.idx, verbose=TRUE, ...)
 }
 
 \arguments{
@@ -20,6 +21,8 @@ sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
                 are variables.}
   \item{L}{A factor with the class labels of the training samples. }
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
+  \item{fdr}{compute FDR values for each feature.}
+  \item{plot.fdr}{show plot with estimated FDR values.}
   \item{verbose}{Report shrinkage intensities (sda) and number of used features (predict.sda).}
   \item{object}{An \code{sda} fit object obtained from the function \code{sda}.}
   \item{Xtest}{A matrix containing the test data set.}
@@ -28,8 +31,6 @@ sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
   \item{...}{Additional arguments for generic predict.}
 }
 \details{
-The SDA approach is particularly suited for high-dimensional classification.
-
 In order to train the LDA or DDA classifier, three separate shrinkage estimators are employed:
 
 \item{class frequencies}{ the  estimator \code{\link[entropy:entropy.shrink]{freqs.shrink}} 
@@ -42,16 +43,17 @@ These estimates are plugged into the LDA and DDA discriminant
 function for prediction.  Note that the three corresponding regularization parameters
 are obtained analytically without resorting to computer intensive resampling.
 }
+
 \value{
   \code{sda} trains the classifier and returns an \code{sda} object
   with the following components needed for the subsequent prediction:
 
   \item{regularization}{a vector containing the three estimated shrinkage intensities,}
    \item{prior}{the estimated class frequencies,}
-   \item{ref}{matrix containing the reference centroids, }
-   \item{coef}{matrix containing the coefficients used for prediction, and}
-   \item{cat}{matrix containing the ``correlation-adjusted t scores'' for each feature and group.}
-
+   \item{predcoef}{matrix containing the coefficients used for prediction, and}
+   \item{ranking}{matrix containing the ``correlation-adjusted t scores'' for each feature
+                 and group.  The overall ranking of a feature is determined by the 
+                 sum of the squared cat scores across all groups.}
    \code{predict.sda} predicts class probabilities for each test sample and returns
    a list with two components:
   \item{class}{a factor with the most probable class assignment, and}
@@ -60,7 +62,7 @@ are obtained analytically without resorting to computer intensive resampling.
 
 
 \author{
-  Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miiika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org}).
 }
 \seealso{\code{\link[entropy:entropy.shrink]{freqs.shrink}}, 
 \code{\link[corpcor:cov.shrink]{var.shrink}}, 
@@ -88,14 +90,30 @@ train.y = srbct.y[1:63]
 test.x = srbct.x[64:83,]
 test.y = srbct.y[64:83]
 
-# classification with correlation (shrinkage LDA)
+###################################################
+# classification with correlation (shrinkage LDA) #
+###################################################
+
 sda.fit = sda(train.x, train.y)
-ynew = predict(sda.fit, test.x)$class
+ynew = predict(sda.fit, test.x)$class # using all 2308 features
 sum(ynew != test.y) # 0
 
-# classification with diagonal covariance (shrinkage DDA)
+sda.fit$ranking[1:20,]
+fidx = sda.fit$ranking[1:20,"idx"]
+ynew = predict(sda.fit, test.x, feature.idx = fidx)$class # using the top 20 features
+sum(ynew != test.y) # 1
+
+###########################################################
+# classification with diagonal covariance (shrinkage DDA) #
+###########################################################
+
 sda.fit = sda(train.x, train.y, diagonal=TRUE)
-ynew = predict(sda.fit, test.x)$class
+ynew = predict(sda.fit, test.x)$class # using all 2308 features
 sum(ynew != test.y) # 4
+
+sda.fit$ranking[1:20,]
+fidx = sda.fit$ranking[1:20,"idx"]
+ynew = predict(sda.fit, test.x, feature.idx = fidx)$class # using the top 20 features
+sum(ynew != test.y) # 2
 }
 \keyword{multivariate}

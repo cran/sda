@@ -1,8 +1,8 @@
-### sda.R  (2008-12-03)
+### sda.R  (2008-12-07)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
-### Copyright 2008 Korbinian Strimmer
+### Copyright 2008 Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,83 +22,165 @@
 ### MA 02111-1307, USA
 
 
-sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
+sda = function(Xtrain, L, diagonal=FALSE, fdr=FALSE, plot.fdr=FALSE, verbose=TRUE)
 {
-   if (missing(L)) stop("Class labels are missing!")
+  if (missing(L)) stop("Class labels are missing!")
 
-   # shrinkage intensities
-   regularization = rep(NA, 3)
-   names(regularization) = c("lambda.freqs", "lambda.var", "lambda")
+  # shrinkage intensities
+  regularization = rep(NA, 3)
+  names(regularization) = c("lambda.freqs", "lambda.var", "lambda")
+  regularization[3] = 1 # for diagonal=TRUE
 
-   # centroids, variances and inverse correlation matrix
-   if (diagonal) # no correlations in this case
-   {
-     tmp = centroids(Xtrain, L, mean.pooled=TRUE, var.pooled=TRUE, var.groups=FALSE, 
+
+  tmp = centroids(Xtrain, L, mean.pooled=TRUE, var.pooled=TRUE, var.groups=FALSE, 
             powcor.pooled=FALSE, shrink=TRUE, verbose=verbose)
-     regularization[2] = attr(tmp$var.pooled, "lambda.var")
-     regularization[3] = 1
-   }
-   else
-   {
-     tmp = centroids(Xtrain, L, mean.pooled=TRUE, var.pooled=TRUE, var.groups=FALSE, 
-            powcor.pooled=TRUE, alpha=-1/2, shrink=TRUE, verbose=verbose)
-     regularization[2] = attr(tmp$var.pooled, "lambda.var")
-     regularization[3] = attr(tmp$powcor.pooled, "lambda")
-
-     if(verbose) cat("Computing inverse correlation matrix (pooled across classes)\n\n")
-     ic = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
-            powcor.pooled=TRUE, alpha=-1, shrink=TRUE, verbose=FALSE)$powcor.pooled
-   }
-
-   n = sum(tmp$samples)        # number of samples
-   p = nrow(tmp$means)         # number of features
-   cl.count = ncol(tmp$means)  # number of classes
  
-   # class frequencies
-   prior = freqs.shrink( tmp$samples, verbose=verbose )
-   regularization[1] = attr(prior, "lambda.freqs")
-   attr(prior, "lambda.freqs") = NULL
-   
-   # correlation adjusted two-sample t-statistic centroid versus pooled mean
-   cat = array(0, dim=c(p, cl.count))
-   coef = array(0, dim=c(p, cl.count))
-   colnames(cat) = colnames(tmp$means)
-   rownames(cat) = rownames(tmp$means)
-   colnames(coef) = colnames(tmp$means)
-   rownames(coef) = rownames(tmp$means)
-   s = sqrt(tmp$var.pooled)
-   attr(s, "lambda.var") = NULL
-   m = sqrt(1/tmp$samples - 1/n) # note the minus sign!
-   for (i in 1:cl.count)
-   {
-      diff = tmp$means[,i]-tmp$mean.pooled
-      cat[,i] = diff/(m[i]*s)           # t score for feature selection
-      coef[,i] = diff/tmp$var.pooled    # coefficient for prediction
-   }
-   if (diagonal==FALSE) # adjust for correlations between features
-   {
-     if (!is.null(dim(tmp$powcor.pooled)))
-     {
-       cat = crossprod(tmp$powcor.pooled, cat) # decorrelate
-       coef = crossprod(ic, coef)              # multiply by inverse correlation 
-     }
-     rm(ic)
-   } 
-   
-   # reference means
-   ref = array(0, dim=c(p, cl.count))
-   colnames(ref) = colnames(tmp$means)
-   rownames(ref) = rownames(tmp$means)
-   for (i in 1:cl.count)
-   {
-      ref[,i] = (tmp$means[,i]+tmp$mean.pooled)/2
-   }
-   rm(tmp)
+  mu = tmp$means
+  mup = tmp$mean.pooled
+  s2 = tmp$var.pooled
+  sc = sqrt(s2)
+  regularization[2] = attr(s2, "lambda.var")
 
-   out = list(regularization=regularization, prior=prior, ref=ref, coef=coef, cat=cat)
-   class(out)="sda"
+  nk = tmp$samples       # samples in class k
+  n = sum(nk)            # number of samples
+  p = nrow(mu)           # number of features
+  cl.count = ncol(mu)    # number of classes
+ 
+  rm(tmp)
 
-   return (out)
+  
+  ############################################################# 
+  # compute coefficients for prediction 
+  #############################################################
+
+  # class frequencies
+  prior = freqs.shrink( nk, verbose=verbose )
+  regularization[1] = attr(prior, "lambda.freqs")
+  attr(prior, "lambda.freqs") = NULL
+
+  # reference means
+  ref = array(0, dim=c(p, cl.count))
+  colnames(ref) = paste("ref.", colnames(mu), sep="")
+  rownames(ref) = rownames(mu)
+  for (k in 1:cl.count)
+  {
+    ref[,k] = (mu[,k]+mup)/2
+  }
+
+  # prediction weights
+  pw = array(0, dim=c(p, cl.count) )
+  colnames(pw) = paste("pw.", colnames(mu), sep="")
+  rownames(pw) = rownames(mu)
+
+  if(!diagonal)
+  {
+    if(verbose) cat("\nComputing inverse correlation matrix (pooled across classes)\n")
+    ic = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
+            powcor.pooled=TRUE, alpha=-1, shrink=TRUE, verbose=FALSE)$powcor.pooled
+
+    # check if estimated correlations are zero
+    if ( is.null(dim(ic)) ) 
+    {
+      regularization[3] = 1
+      diagonal = TRUE
+    }
+    else # compute inverse covariance matrix
+    {
+      regularization[3] = attr(ic, "lambda")
+      invS = sweep(sweep(ic, 1, 1/sc, "*"), 2, 1/sc, "*")
+    }
+    rm (ic)
+
+    if(verbose) cat("Estimating optimal shrinkage intensity lambda (correlation matrix):", 
+                    round(regularization[3], 4), "\n")
+  }
+
+  for (k in 1:cl.count)
+  {
+    diff = mu[,k]-mup
+    if (diagonal)
+    { 
+      pw[,k] = diff/s2
+    }
+    else
+    {
+      pw[,k] = crossprod(invS, diff)
+    }
+  }
+  if (!diagonal) rm(invS)
+
+
+
+  ############################################################# 
+  # compute coefficients for feature ranking
+  #############################################################
+
+  # compute cat scores (centroid vs. pooled mean)
+  cat = array(0, dim=c(p, cl.count))
+  colnames(cat) = paste("cat.", colnames(mu), sep="")
+  rownames(cat) = rownames(mu)
+
+  if(!diagonal)
+  {
+    if(verbose) cat("Computing the square root of the inverse pooled correlation matrix\n")
+
+    invCor.sqrt = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
+            powcor.pooled=TRUE, alpha=-1/2, shrink=TRUE, verbose=FALSE)$powcor.pooled
+  }
+
+  m = sqrt(1/nk - 1/n) # note the minus sign!
+  for (k in 1:cl.count)
+  {
+    diff = mu[,k]-mup
+    if (diagonal)
+    { 
+      cat[,k] = diff/(m[k]*sc)
+    }
+    else
+    {
+      cat[,k] = crossprod(invCor.sqrt, diff/(m[k]*sc) )
+    }
+  }
+  if (!diagonal) rm(invCor.sqrt)
+
+  score = apply(cat^2, 1, sum) # sum of squared cat-scores
+  names(score) = rownames(cat)
+  idx = order(score, decreasing = TRUE)
+
+  if (fdr)
+  {
+    if (verbose) cat("\nComputing FDR values to assess significance of each feature\n")
+
+    if (cl.count == 2)
+    {
+      fdr.out = fdrtool(cat[,1], plot=plot.fdr, verbose=FALSE)
+    }
+    else
+    {
+      #cat("Using Wilson-Hilferty transformation\n")
+      z = score^(1/3) # Wilson-Hilferty transformation to normality
+      z = z-median(z) 
+      fdr.out = fdrtool(z, plot=plot.fdr, verbose=FALSE)
+    }
+ 
+    ranking = cbind(idx, score[idx], cat[idx,],
+                fdr.out$lfdr[idx], fdr.out$qval[idx], fdr.out$pval[idx])
+    colnames(ranking) = c("idx", "score", colnames(cat), "lfdr", "qval", "pval")
+    rm(fdr.out)
+  }
+  else
+  {
+    ranking = cbind(idx, score[idx], cat[idx,])
+    colnames(ranking) = c("idx", "score", colnames(cat))
+  }
+  rm(cat)
+
+  ############################################################# 
+
+  out = list(regularization=regularization, prior=prior, 
+             predcoef=cbind(ref, pw), ranking=ranking)
+  class(out)="sda"
+
+  return (out)
 }
-
 

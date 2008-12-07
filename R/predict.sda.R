@@ -1,4 +1,4 @@
-### predict.sda.R  (2008-12-01)
+### predict.sda.R  (2008-12-07)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
@@ -34,7 +34,7 @@ predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
     stop("A new data to predict must be supplied.")
   }
 
-  if (missing(feature.idx)) feature.idx = 1:nrow(object$cat)
+  if (missing(feature.idx)) feature.idx = 1:nrow(object$predcoef)
   
   Xtest = as.matrix(Xtest)
   ntest = nrow(Xtest)
@@ -45,8 +45,8 @@ predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
   score = numeric(cl.count) 
   yhat = integer(ntest)
 
-  pw = object$coef[feature.idx, , drop=FALSE]
-  ref = object$ref[feature.idx, , drop=FALSE]
+  pw = object$predcoef[feature.idx, 1:cl.count+cl.count, drop=FALSE]
+  ref = object$predcoef[feature.idx,(1:cl.count), drop=FALSE]
 
   if (verbose) cat("Prediction uses", nrow(pw), "features.\n")
 
