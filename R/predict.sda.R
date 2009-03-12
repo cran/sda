@@ -1,8 +1,8 @@
-### predict.sda.R  (2008-12-07)
+### predict.sda.R  (2009-02-27)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
-### Copyright 2008 Korbinian Strimmer
+### Copyright 2008-2009 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -33,13 +33,18 @@ predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
   if ( missing(Xtest) ) {
     stop("A new data to predict must be supplied.")
   }
-
-  if (missing(feature.idx)) feature.idx = 1:nrow(object$predcoef)
   
-  Xtest = as.matrix(Xtest)
+  if (!is.matrix(Xtest)) stop("Test data must be given as matrix!")
   ntest = nrow(Xtest)
   freq = object$prior
   cl.count = length(freq)
+
+  if (ncol(Xtest) != nrow(object$predcoef))
+    stop("Different number of predictors in sda object (", 
+         nrow(object$predcoef), ") and in test data (", 
+         ncol(Xtest), ")", sep="")
+
+  if (missing(feature.idx)) feature.idx = 1:nrow(object$predcoef)
 
   probs = array(0, dim=c(ntest, cl.count) )
   score = numeric(cl.count) 

@@ -1,8 +1,8 @@
-### centroids.R  (2008-12-04)
+### centroids.R  (2009-02-27)
 ###
 ###    Group centroids, variances, and correlations
 ###
-### Copyright 2008 Korbinian Strimmer
+### Copyright 2008-2009 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -26,6 +26,7 @@
 centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE, 
   var.groups=FALSE, powcor.pooled=FALSE, alpha=1, shrink=FALSE, verbose=TRUE)
 {
+  if (!is.matrix(x)) stop("Input x must be a matrix!")
   p = ncol(x)
   n = nrow(x)
 
@@ -139,8 +140,15 @@ centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE,
     attr(powr, "lambda.estimated") = NULL      
 
     # note there is no correction factor for correlation
-    colnames(powr) = colnames(x)
-    rownames(powr) = colnames(x)
+    if (is.matrix(powr))
+    {
+      colnames(powr) = colnames(x)
+      rownames(powr) = colnames(x)
+    }
+    else
+    {
+      names(powr) = colnames(x)
+    }
   }
   else
   {

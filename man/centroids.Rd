@@ -33,14 +33,13 @@ and  \code{\link[corpcor:cov.shrink]{cor.shrink}} from Sch\"afer and Strimmer (2
 \value{
   \code{centroids} returns a list
   with the following components:
-
   \item{samples}{a vector containing the samples sizes in each group,}
    \item{means}{the empirical group means,}
    \item{mean.pooled}{the pooled empirical mean,}
    \item{var.pooled}{a vector containing the pooled variances,}
    \item{var.groups}{a matrix containing the group-specific variances, and}
    \item{powcor.pooled}{a matrix containing the pooled correlation matrix to the power of \code{alpha}
-                        (if all correlations are zero a vector only 1s is returned to save space). }
+                        (if all correlations are zero a vector containing only the  is returned to save space). }
    \item{alpha}{exponent for the pooled correlation matrix.}
 }
 

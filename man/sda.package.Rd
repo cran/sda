@@ -5,19 +5,25 @@
 \title{The sda package}
 
 \description{This package performs linear and diagonal discriminant analysis
-where the classifier is trained using Stein-type shrinkage estimators.
+with variable selection.
 
-Specifically, three separate shrinkage estimators are employed for the
-
-\item{class frequencies}{following Hausser and Strimmer (2008),} 
-\item{variances}{following Opgen-Rhein and Strimmer (2007), and}
-\item{correlations}{following Sch\"afer and Strimmer (2005).} 
-
-The estimates are plugged into the LDA and DDA discriminant
-function for prediction.  Note that the three corresponding regularization parameters
-are obtained analytically without resorting to computer intensive resampling.
+The classifier is trained using James-Stein-type shrinkage estimators.
+Variable selection is based on a univariate test statistics
+(multi-class cat score) and subsequent false non-discovery rate (FNDR) testing.
+In addition, higher criticism (HC) feature scores are computed and can also be used 
+for feature thresholding.
 
 This approach is particularly suited for high-dimensional classification.
+For details see Ahdesm\"aki and Strimmer (2009).
+
+Typically the functions in this package are applied in three steps:
+\itemize{
+\item{Step 1:}{feature selection with \code{\link{sda.ranking}},} 
+\item{Step 2:}{training the classifier with \code{\link{sda}}, and}
+\item{Step 3:}{classification using \code{\link{predict.sda}}.} 
+}
+The accompanying web site (see below) provides example R scripts to illustrate
+the functionality of this package.
 }
 
 \author{Miika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org/})}
@@ -26,5 +32,5 @@ This approach is particularly suited for high-dimensional classification.
 }
 \keyword{multivariate}
 \seealso{
-\code{\link{sda}, \link{predict.sda}}
+ \code{\link{sda.ranking}}, \code{\link{sda}}, \code{\link{predict.sda}}. 
 }

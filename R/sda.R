@@ -1,8 +1,8 @@
-### sda.R  (2008-12-07)
+### sda.R  (2009-02-27)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
-### Copyright 2008 Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-09 Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,8 +22,9 @@
 ### MA 02111-1307, USA
 
 
-sda = function(Xtrain, L, diagonal=FALSE, fdr=FALSE, plot.fdr=FALSE, verbose=TRUE)
+sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
 {
+  if (!is.matrix(Xtrain)) stop("Training data must be given as matrix!")
   if (missing(L)) stop("Class labels are missing!")
 
   # shrinkage intensities
@@ -112,73 +113,9 @@ sda = function(Xtrain, L, diagonal=FALSE, fdr=FALSE, plot.fdr=FALSE, verbose=TRU
 
 
   ############################################################# 
-  # compute coefficients for feature ranking
-  #############################################################
-
-  # compute cat scores (centroid vs. pooled mean)
-  cat = array(0, dim=c(p, cl.count))
-  colnames(cat) = paste("cat.", colnames(mu), sep="")
-  rownames(cat) = rownames(mu)
-
-  if(!diagonal)
-  {
-    if(verbose) cat("Computing the square root of the inverse pooled correlation matrix\n")
-
-    invCor.sqrt = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
-            powcor.pooled=TRUE, alpha=-1/2, shrink=TRUE, verbose=FALSE)$powcor.pooled
-  }
-
-  m = sqrt(1/nk - 1/n) # note the minus sign!
-  for (k in 1:cl.count)
-  {
-    diff = mu[,k]-mup
-    if (diagonal)
-    { 
-      cat[,k] = diff/(m[k]*sc)
-    }
-    else
-    {
-      cat[,k] = crossprod(invCor.sqrt, diff/(m[k]*sc) )
-    }
-  }
-  if (!diagonal) rm(invCor.sqrt)
-
-  score = apply(cat^2, 1, sum) # sum of squared cat-scores
-  names(score) = rownames(cat)
-  idx = order(score, decreasing = TRUE)
-
-  if (fdr)
-  {
-    if (verbose) cat("\nComputing FDR values to assess significance of each feature\n")
-
-    if (cl.count == 2)
-    {
-      fdr.out = fdrtool(cat[,1], plot=plot.fdr, verbose=FALSE)
-    }
-    else
-    {
-      #cat("Using Wilson-Hilferty transformation\n")
-      z = score^(1/3) # Wilson-Hilferty transformation to normality
-      z = z-median(z) 
-      fdr.out = fdrtool(z, plot=plot.fdr, verbose=FALSE)
-    }
- 
-    ranking = cbind(idx, score[idx], cat[idx,],
-                fdr.out$lfdr[idx], fdr.out$qval[idx], fdr.out$pval[idx])
-    colnames(ranking) = c("idx", "score", colnames(cat), "lfdr", "qval", "pval")
-    rm(fdr.out)
-  }
-  else
-  {
-    ranking = cbind(idx, score[idx], cat[idx,])
-    colnames(ranking) = c("idx", "score", colnames(cat))
-  }
-  rm(cat)
-
-  ############################################################# 
 
   out = list(regularization=regularization, prior=prior, 
-             predcoef=cbind(ref, pw), ranking=ranking)
+             predcoef=cbind(ref, pw))
   class(out)="sda"
 
   return (out)

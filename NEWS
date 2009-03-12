@@ -2,6 +2,16 @@
                RELEASE HISTORY OF THE "sda" PACKAGE
              ========================================
 
+              CHANGES IN `sda' PACKAGE VERSION 1.1.0 
+
+- new sda.ranking() function
+- plot function for "sda.ranking" objects 
+- additional to FDR values computation of higher-criticism scores
+- reference to Ahdesm\"aki and Strimmer (2009) paper added
+- Singh et al. (2002) example data added
+- improved help pages and examples
+- the data khan.x is now on log-scale
+
 
               CHANGES IN `sda' PACKAGE VERSION 1.0.3 
 
