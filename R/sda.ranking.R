@@ -1,8 +1,8 @@
-### sda.ranking.R  (2009-03-12)
+### sda.ranking.R  (2011-06-26)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
-### Copyright 2008-09 Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-11 Miika Ahdesmaki, Verena Zuber and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,74 +22,13 @@
 ### MA 02111-1307, USA
 
 
-
 sda.ranking = function(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 {
-  if (!is.matrix(Xtrain)) stop("Training data must be given as matrix!")
-  if (missing(L)) stop("Class labels are missing!")
+  cat = catscore(Xtrain, L, diagonal=diagonal, shrink=TRUE, verbose=verbose)
 
-  if(verbose) 
-  {
-    if(diagonal)
-      cat("Computing shrinkage t-scores (centroid vs. pooled mean) for feature ranking\n\n")
-    else
-      cat("Computing shrinkage cat scores (centroid vs. pooled mean) for feature ranking\n\n")
-  }
+  cl.count = dim(cat)[2]
 
-  tmp = centroids(Xtrain, L, mean.pooled=TRUE, var.pooled=TRUE, var.groups=FALSE, 
-            powcor.pooled=FALSE, shrink=TRUE, verbose=verbose)
- 
-  mu = tmp$means
-  mup = tmp$mean.pooled
-  s2 = tmp$var.pooled
-  sc = sqrt(s2)
- 
-  nk = tmp$samples       # samples in class k
-  n = sum(nk)            # number of samples
-  p = nrow(mu)           # number of features
-  cl.count = ncol(mu)    # number of classes
- 
-  rm(tmp)
-
-
-  ############################################################# 
-  # compute coefficients for feature ranking
-  #############################################################
-
-  # compute cat scores (centroid vs. pooled mean)
-
-  cat = array(0, dim=c(p, cl.count))
-  colnames(cat) = paste("cat.", colnames(mu), sep="")
-  rownames(cat) = rownames(mu)
-
-  if(!diagonal)
-  {
-    if(verbose) cat("Computing the square root of the inverse pooled correlation matrix\n")
-
-    invCor.sqrt = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
-            powcor.pooled=TRUE, alpha=-1/2, shrink=TRUE, verbose=FALSE)$powcor.pooled
-
-    lambda = attr(invCor.sqrt, "lambda")
-    if(verbose) cat("Estimating optimal shrinkage intensity lambda (correlation matrix):", 
-                    round(lambda, 4), "\n")
-  }
-
-  m = sqrt(1/nk - 1/n) # note the minus sign!
-  for (k in 1:cl.count)
-  {
-    diff = mu[,k]-mup
-    if (diagonal)
-    { 
-      cat[,k] = diff/(m[k]*sc)
-    }
-    else
-    {
-      cat[,k] = crossprod(invCor.sqrt, diff/(m[k]*sc) )
-    }
-  }
-  if (!diagonal) rm(invCor.sqrt)
-
-  score = apply(cat^2, 1, sum) # sum of squared cat-scores
+  score = apply(cat^2, 1, sum) # sum of squared CAT-scores
   names(score) = rownames(cat)
   idx = order(score, decreasing = TRUE)
 
@@ -115,12 +54,8 @@ sda.ranking = function(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verb
     lfdr = fdr.out$lfdr # local false discovery rates
     pval = fdr.out$pval # p-values
 
-    # compute absolute HC score for each p-value
-    rp = rank(pval)/p
-    v = rp*(1-rp)
-    v[v==0] = min( v[v > 0] ) # just to make sure we have no zero v
-    HC = sqrt(p)*(rp-pval)/sqrt(v)
-    HC = abs(HC)
+    # compute HC score for each p-value
+    HC = pvt.hcobj(pval)
 
     ranking = cbind(idx, score[idx], cat[idx, , drop=FALSE], lfdr[idx], HC[idx])
     colnames(ranking) = c("idx", "score", colnames(cat), "lfdr", "HC")
@@ -157,7 +92,10 @@ plot.sda.ranking = function(x, top=40, ...)
 
   idx = 2+(1:cl.count)
   cn = colnames(x)[idx]
-  colnames(x)[idx] = substr(cn, 5, nchar(cn))
+  if(diagonal)
+    colnames(x)[idx] = substr(cn, 3, nchar(cn))
+  else
+    colnames(x)[idx] = substr(cn, 5, nchar(cn))
 
   if (is.null(rownames(x))) rownames(x) = x[, 1]
 
@@ -171,6 +109,5 @@ plot.sda.ranking = function(x, top=40, ...)
     xlab = xlab, 
     layout=c(cl.count,1), ...) 
 }
-
 
 

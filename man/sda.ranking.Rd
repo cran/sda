@@ -2,10 +2,11 @@
 \alias{sda.ranking}
 \alias{plot.sda.ranking}
 
-\title{Shrinkage Discriminant Analysis 1: Feature Ranking}
+\title{Shrinkage Discriminant Analysis 1: Predictor Ranking}
 
 \description{
-  \code{sda.ranking} determines a ranking of features by computing cat scores
+  \code{sda.ranking} determines a ranking of predictors by computing  CAT scores
+   (correlation-adjusted t-scores)
    between the group centroids and the pooled mean.
 
   \code{plot.sda.ranking} provides a graphical visualization of the top ranking features..
@@ -30,26 +31,27 @@ sda.ranking(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
    \item{...}{Additional arguments for generic plot.}
 }
 \details{
-For each feature and centroid a shrinkage cat scores of the mean versus
+For each predictor variable and centroid a shrinkage CAT scores of the mean versus
 the pooled mean is computed.  The overall ranking of a feature is determined
 by the sum of the squared cat scores across all centroids.
-For the diagonal case (LDA) the cat score reduce to the t-score.  Thus in the
-two-class diagonal case the feature are simply ranked according to the
+For the diagonal case (LDA) the (shrinkage) CAT score reduces to the (shrinkage) t-score.  Thus in the two-class diagonal case the feature are simply ranked according to the
 (shrinkage) t-scores.
 
-Calling \code{sda.ranking} should be step 1 in a classification analysis.  Steps 2 and 3 are 
+Calling \code{sda.ranking} is step 1 in a classification analysis with the
+sda package.  Steps 2 and 3 are 
 \code{\link{sda}} and \code{\link{predict.sda}}
 
-See Ahdesm\"aki and Strimmer (2009) for details.  For the case of two classes
-see Zuber and Strimmer (2009). 
+See Ahdesm\"aki and Strimmer (2010) for details on multi-class CAT scores,
+Zuber and Strimmer (2009) for CAT scores in general.  For shrinkage t scores
+see Opgen-Rhein and Strimmer (2007). 
 }
 
 \value{
 
-   \code{sda.ranking} returns a matrix with the follwing columns:
+   \code{sda.ranking} returns a matrix with the following columns:
 
   \item{idx}{original feature number}
-   \item{score}{sum of the squared cat scores - this determines the overall ranking }
+   \item{score}{sum of the squared CAT scores across groups - this determines the overall ranking of a feature}
    \item{cat}{for each group and feature the cat score of the centroid versus the pooled mean}
 
   If \code{fdr=TRUE} then additionally local false discovery rate (FDR) values 
@@ -58,18 +60,22 @@ see Zuber and Strimmer (2009).
 
 }
 \references{
-Ahdesm\"aki, A., and K. Strimmer. 2009.  Feature selection in "omics" prediction problems 
-using cat scores and false non-discovery rate control.
-See \url{http://arxiv.org/abs/0903.2003} for publication details.
+Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
+using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
+Preprint available from \url{http://arxiv.org/abs/0903.2003}.
+
+Opgen-Rhein, R., and K. Strimmer. 2007. Accurate ranking of differentially expressed 
+genes by a distribution-free shrinkage approach.  
+ Statist. Appl. Genet. Mol. Biol. 6:9.
 
 Zuber, V., and K. Strimmer. 2009.  Gene ranking and biomarker discovery under correlation.
-See \url{http://arxiv.org/abs/0902.0751} for publication details.
-}
+Bioinformatics 25: 2700-2707.
+Preprint available from \url{http://arxiv.org/abs/0902.0751}.}
 
 \author{
-  Miiika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miiika Ahdesm\"aki, Verena Zuber and Korbinian Strimmer (\url{http://strimmerlab.org}).
 }
-\seealso{\code{\link{sda}}, \code{\link{predict.sda}}.}
+\seealso{\code{\link{catscore}}, \code{\link{sda}}, \code{\link{predict.sda}}.}
 
 \examples{
 # load sda library
@@ -114,7 +120,7 @@ which.max( ranking.DDA[1:1000,"HC"] )
 # feature ranking (full covariance) #
 #####################################
 
-# ranking using cat-scores (LDA)
+# ranking using CAT-scores (LDA)
 ranking.LDA = sda.ranking(Xtrain, Ytrain, diagonal=FALSE)
 ranking.LDA[1:10,]
 

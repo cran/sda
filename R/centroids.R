@@ -1,8 +1,8 @@
-### centroids.R  (2009-02-27)
+### centroids.R  (2011-06-26)
 ###
 ###    Group centroids, variances, and correlations
 ###
-### Copyright 2008-2009 Korbinian Strimmer
+### Copyright 2008-2011 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -23,8 +23,8 @@
 
 
 
-centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE, 
-  var.groups=FALSE, powcor.pooled=FALSE, alpha=1, shrink=FALSE, verbose=TRUE)
+centroids = function(x, L,  
+  var.groups=FALSE, centered.data=FALSE, shrink=FALSE, verbose=TRUE)
 {
   if (!is.matrix(x)) stop("Input x must be a matrix!")
   p = ncol(x)
@@ -44,38 +44,39 @@ centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE,
     cat("Number of classes:", cl.count, "\n\n")
   }
 
-  # means
-  mu = array(0, dim=c(p, cl.count))
-  colnames(mu) = cl.names
+  
+  # setup arrays
+  mu = array(0, dim=c(p, cl.count+1))
+  colnames(mu) = c(cl.names, "(pooled)")
   rownames(mu) = colnames(x)
- 
-  if(var.pooled || powcor.pooled)
-  {
-     xc = array(0, dim=c(n,p))  # storage for centered data
-     #colnames(xc) = colnames(x)
-  }
 
+  xc = array(0, dim=c(n,p))  # storage for centered data
+  rownames(xc) = rownames(x)
+  colnames(xc) = colnames(x)
+ 
   if(var.groups)
   {
-    # storage for variances
-    v = array(0, dim=c(p, cl.count))
-    colnames(v) = c(cl.names)
+    v = array(0, dim=c(p, cl.count+1)) # storage for variances
+    if(shrink) attr(v, "lambda.var") = numeric(cl.count+1)
+    colnames(v) = c(cl.names, "(pooled)")
     rownames(v) = colnames(x)
-    if (shrink) attr(v, "lambda.var") = numeric(cl.count)
   }
   else
   {
-    v = NULL
-  }
+    v = array(0, dim=c(p, 1)) # store only pooled variances
+    if(shrink) attr(v, "lambda.var") = numeric(1)
+    colnames(v) = c("(pooled)")
+    rownames(v) = colnames(x)
+  }  
 
+  # compute means and variance in each group
   for (k in 1:cl.count)
   {
      idx = groups$idx[,k]
      Xk = x[ idx, ,drop = FALSE]
      mu[,k] = colMeans(Xk)
 
-     if(var.pooled || powcor.pooled)
-       xc[idx,] = sweep(Xk, 2, mu[,k]) # center data
+     xc[idx,] = sweep(Xk, 2, mu[,k]) # center data
 
      if (var.groups)
      {
@@ -90,82 +91,36 @@ centroids = function(x, L, mean.pooled=FALSE, var.pooled=TRUE,
           v[,k] = as.vector(var.shrink(Xk, lambda.var=0, verbose=FALSE))
      }
   }
-
-  if (var.pooled)
-  {
-    if (verbose) cat("Estimating variances (pooled across classes)\n")
-   
-    if (shrink)
-    {
-      v.pool = var.shrink(xc, verbose=verbose)
-    }
-    else
-    {
-      v.pool = as.vector(var.shrink(xc, lambda.var=0, verbose=FALSE))
-      attr(v.pool, "lambda.var") = NULL
-    }
-    attr(v.pool, "class") = NULL
-    attr(v.pool, "lambda.var.estimated") = NULL
-    
-    v.pool = v.pool*(n-1)/(n-cl.count)
-    names(v.pool) = colnames(x)
-  }
-  else
-  {
-    v.pool = NULL
-  }
   
-  if (powcor.pooled)
+  # compute pooled mean and variance
+  mu[,cl.count+1] = colMeans(x) # pooled mean
+ 
+  if (verbose) cat("Estimating variances (pooled across classes)\n")
+  if (var.groups)
   {
-    if (verbose)
-    {
-       if (alpha==1)
-         cat("Estimating correlation matrix (pooled across classes)\n")
-       else if (alpha==-1)
-         cat("Estimating inverse correlation matrix (pooled across classes)\n")
-       else
-         cat("Estimating correlation matrix to the power of", alpha, "(pooled across classes)\n")
-    }
-
     if (shrink)
-    {
-      powr = powcor.shrink(xc, alpha=alpha, collapse=TRUE, verbose=verbose)
-    }
+      v.pool = var.shrink(xc, verbose=verbose)
     else
-    {
-      powr = powcor.shrink(xc, alpha=alpha, lambda=0, collapse=TRUE, verbose=FALSE)
-      attr(powr, "lambda") = NULL
-    }
-    attr(powr, "class") = NULL
-    attr(powr, "lambda.estimated") = NULL      
-
-    # note there is no correction factor for correlation
-    if (is.matrix(powr))
-    {
-      colnames(powr) = colnames(x)
-      rownames(powr) = colnames(x)
-    }
-    else
-    {
-      names(powr) = colnames(x)
-    }
-  }
+      v.pool = as.vector(var.shrink(xc, lambda.var=0, verbose=FALSE))
+    v[,cl.count+1] = v.pool*(n-1)/(n-cl.count) # correction factor
+    if (shrink) attr(v, "lambda.var")[cl.count+1] = attr(v.pool, "lambda.var")
+  }  
   else
   {
-    powr = NULL
+    if (shrink)
+      v.pool = var.shrink(xc, verbose=verbose)
+    else
+      v.pool = as.vector(var.shrink(xc, lambda.var=0, verbose=FALSE))
+    v[,1] = v.pool*(n-1)/(n-cl.count) # correction factor
+    if (shrink) attr(v, "lambda.var")[1] = attr(v.pool, "lambda.var")
   }
 
-  if (mean.pooled)
-  {
-    mu.pooled = colMeans(x)
-  }
-  else
-  {
-    mu.pooled = NULL
-  }
+  if(centered.data == FALSE) xc=NULL
 
-  return( list(samples=samples, means=mu, mean.pooled=mu.pooled, 
-    var.pooled=v.pool, var.groups=v, powcor.pooled=powr, alpha=alpha))
+  ##
+
+  return( list(samples=samples, means=mu, variances=v, 
+     centered.data=xc))
 }
 
 

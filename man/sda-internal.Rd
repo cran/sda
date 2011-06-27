@@ -2,6 +2,7 @@
 
 \alias{score2prob}
 \alias{pvt.groups}
+\alias{pvt.hcobj}
 
 \title{Internal sda functions}
 \description{

@@ -1,15 +1,14 @@
 \name{centroids}
 \alias{centroids}
 
-\title{Group Centroids, (Pooled) Variances, and Powers of the Pooled Correlation Matrix}
+\title{Group Centroids and (Pooled) Variances}
 
 \usage{
-centroids(x, L, mean.pooled=FALSE, var.pooled=TRUE, var.groups=FALSE, 
-  powcor.pooled=FALSE, alpha=1, shrink=FALSE, verbose=TRUE)
+centroids(x, L, var.groups=FALSE, centered.data=FALSE, shrink=FALSE, verbose=TRUE)
 }
 \description{
-  \code{centroids} computes group centroids and optionally the pooled mean 
-   and pooled variance, the group specific variances, and powers of the pooled correlation matrix.
+  \code{centroids} computes group centroids, the pooled mean 
+   and pooled variance, and optionally the group specific variances.
 }
 
 \arguments{
@@ -17,30 +16,26 @@ centroids(x, L, mean.pooled=FALSE, var.pooled=TRUE, var.groups=FALSE,
                 the rows are sample observations and the columns
                 are variables.}
   \item{L}{A factor with the group labels. }
-  \item{mean.pooled}{Estimate the pooled mean.}
-  \item{var.pooled}{Estimate the pooled variances.}
-  \item{var.groups}{Estimate all group-specific variances.}
-  \item{powcor.pooled}{Estimate pooled correlation matrix (taken to the power of \code{alpha}).}
-  \item{alpha}{exponent for the pooled correlation matrix (default: \code{alpha=1}). }
-  \item{shrink}{Use empirical or shrinkage estimator.}
+  \item{var.groups}{Estimate group-specific variances.}
+  \item{centered.data}{Return column-centered data matrix.}
+  \item{shrink}{Use empirical estimates or a shrinkage estimator for the variances.}
   \item{verbose}{Provide some messages while computing.}
 }
 \details{
 If option \code{shrink=TRUE} then the shrinkage estimators 
  \code{\link[corpcor:cov.shrink]{var.shrink}} from Opgen-Rhein and Strimmer (2007)
 and  \code{\link[corpcor:cov.shrink]{cor.shrink}} from Sch\"afer and Strimmer (2005) are used.
+
+Details on the algorithm for efficiently computing the power of the shrinkage correlation 
+matrix are given in Zuber and Strimmer (2009).
 }
 \value{
   \code{centroids} returns a list
   with the following components:
   \item{samples}{a vector containing the samples sizes in each group,}
-   \item{means}{the empirical group means,}
-   \item{mean.pooled}{the pooled empirical mean,}
-   \item{var.pooled}{a vector containing the pooled variances,}
-   \item{var.groups}{a matrix containing the group-specific variances, and}
-   \item{powcor.pooled}{a matrix containing the pooled correlation matrix to the power of \code{alpha}
-                        (if all correlations are zero a vector containing only the  is returned to save space). }
-   \item{alpha}{exponent for the pooled correlation matrix.}
+   \item{means}{the group means and the pooled mean,}
+   \item{variances}{the group-specific and the pooled variances, and}
+   \item{centered.data}{a matrix containing the centered data.}
 }
 
 
@@ -62,17 +57,18 @@ Y = iris[,5]
 
 ## estimate centroids and empirical pooled variances
 centroids(X, Y)
-
-## show pooled mean
-centroids(X, Y, mean.pooled=TRUE)
-
-## compute group-specific variances
+          
+## also compute group-specific variances
 centroids(X, Y, var.groups=TRUE)
+   
+## use shrinkage estimator for the variances
+centroids(X, Y, var.groups=TRUE, shrink=TRUE)
 
-## and inverse pooled correlation
-centroids(X, Y, var.groups=TRUE, powcor.pooled=TRUE, alpha=-1)
+## return centered data
+xc = centroids(X, Y, centered.data=TRUE)$centered.data
+apply(xc, 2, mean)
 
-## use shrinkage estimator for variances and correlations
-centroids(X, Y, var.groups=TRUE, powcor.pooled=TRUE, alpha=-1, shrink=TRUE)
+## compute pooled inverse correlation matrix
+powcor.shrink(xc, alpha=-1)
 }
 \keyword{multivariate}

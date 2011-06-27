@@ -2,6 +2,17 @@
                RELEASE HISTORY OF THE "sda" PACKAGE
              ========================================
 
+              CHANGES IN `sda' PACKAGE VERSION 1.1.1
+
+- requires now corpcor 1.6.0 and R version 2.10.0 
+- new function catscore()
+- centroids() function has been streamlined and simplified
+- updated documentation
+- employs function crossprod.powcor.shrink() of corpcor
+  which leads to reduced memory imprint and increased speed
+  in functions catscore(), sda.ranking() and sda()
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.1.0 
 
 - new sda.ranking() function

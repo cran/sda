@@ -1,8 +1,8 @@
-### sda.R  (2009-02-27)
+### sda.R  (2011-06-26)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
-### Copyright 2008-09 Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-11 Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -33,20 +33,23 @@ sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
   regularization[3] = 1 # for diagonal=TRUE
 
 
-  tmp = centroids(Xtrain, L, mean.pooled=TRUE, var.pooled=TRUE, var.groups=FALSE, 
-            powcor.pooled=FALSE, shrink=TRUE, verbose=verbose)
+  tmp = centroids(Xtrain, L, var.groups=FALSE, centered.data=TRUE,
+    shrink=TRUE, verbose=verbose)
+  
+  cl.count = ncol(tmp$means)-1    # number of classes
  
-  mu = tmp$means
-  mup = tmp$mean.pooled
-  s2 = tmp$var.pooled
-  sc = sqrt(s2)
-  regularization[2] = attr(s2, "lambda.var")
+  mu = tmp$means[,1:cl.count]
+  mup = tmp$means[,cl.count+1]
+  s2 = tmp$variances[,1]
+  sc = sqrt(s2)  
+  regularization[2] = attr(tmp$variances, "lambda.var")[1]
 
   nk = tmp$samples       # samples in class k
   n = sum(nk)            # number of samples
   p = nrow(mu)           # number of features
-  cl.count = ncol(mu)    # number of classes
  
+  xc = tmp$centered.data # to compute inverse pooled correlation matrix
+
   rm(tmp)
 
   
@@ -73,43 +76,28 @@ sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
   colnames(pw) = paste("pw.", colnames(mu), sep="")
   rownames(pw) = rownames(mu)
 
+  for (k in 1:cl.count)
+  {
+    diff = mu[,k]-mup  
+    pw[,k] = diff/sc
+  }
+
+
   if(!diagonal)
   {
     if(verbose) cat("\nComputing inverse correlation matrix (pooled across classes)\n")
-    ic = centroids(Xtrain, L, mean.pooled=FALSE, var.pooled=FALSE, var.groups=FALSE, 
-            powcor.pooled=TRUE, alpha=-1, shrink=TRUE, verbose=FALSE)$powcor.pooled
-
-    # check if estimated correlations are zero
-    if ( is.null(dim(ic)) ) 
-    {
-      regularization[3] = 1
-      diagonal = TRUE
-    }
-    else # compute inverse covariance matrix
-    {
-      regularization[3] = attr(ic, "lambda")
-      invS = sweep(sweep(ic, 1, 1/sc, "*"), 2, 1/sc, "*")
-    }
-    rm (ic)
-
+    pw = crossprod.powcor.shrink(xc, pw, alpha=-1, verbose=FALSE)
+    regularization[3] = attr(pw, "lambda")
+    attr(pw, "lambda") = NULL
     if(verbose) cat("Estimating optimal shrinkage intensity lambda (correlation matrix):", 
                     round(regularization[3], 4), "\n")
+    
   }
 
   for (k in 1:cl.count)
   {
-    diff = mu[,k]-mup
-    if (diagonal)
-    { 
-      pw[,k] = diff/s2
-    }
-    else
-    {
-      pw[,k] = crossprod(invS, diff)
-    }
+    pw[,k] = pw[,k]/sc
   }
-  if (!diagonal) rm(invS)
-
 
 
   ############################################################# 

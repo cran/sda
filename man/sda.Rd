@@ -25,9 +25,9 @@ In order to train the LDA or DDA classifier, three separate shrinkage estimators
 \itemize{
  \item{class frequencies:}{ the  estimator \code{\link[entropy:entropy.shrink]{freqs.shrink}} 
            from   Hausser and Strimmer (2008),}
- \item{variances:}{the estimator \code{\link[corpcor:cov.shrink]{var.shrink}} from Opgen-Rhein and Strimmer (2007),  }
+ \item{variances:}{ the estimator \code{\link[corpcor:cov.shrink]{var.shrink}} from Opgen-Rhein and Strimmer (2007),  }
 
- \item{correlations}{the estimator \code{\link[corpcor:cov.shrink]{cor.shrink}} from Sch\"afer and Strimmer (2005).  }
+ \item{correlations:}{ the estimator \code{\link[corpcor:cov.shrink]{cor.shrink}} from Sch\"afer and Strimmer (2005).  }
 }
 Note that the three corresponding regularization parameters
 are obtained analytically without resorting to computer intensive resampling.
@@ -40,13 +40,13 @@ are obtained analytically without resorting to computer intensive resampling.
 
   \item{regularization}{a vector containing the three estimated shrinkage intensities,}
    \item{prior}{the estimated class frequencies,}
-   \item{predcoef}{matrix containing the coefficients used for prediction, and}
+   \item{predcoef}{matrix containing the coefficients used for prediction}
 }
 
 \references{
-Ahdesm\"aki, A., and K. Strimmer. 2009.  Feature selection in "omics" prediction problems 
-using cat scores and false non-discovery rate control.
-See \url{http://arxiv.org/abs/0903.2003} for publication details.
+Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
+using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
+Preprint available from \url{http://arxiv.org/abs/0903.2003}.
 }
 
 \author{
