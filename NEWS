@@ -2,7 +2,14 @@
                RELEASE HISTORY OF THE "sda" PACKAGE
              ========================================
 
-              CHANGES IN `sda' PACKAGE VERSION 1.1.1
+
+              CHANGES IN `sda' PACKAGE VERSION 1.2.1
+
+- NAMESPACE file added
+- updated requirements for "corpcor" and "entropy"
+
+
+              CHANGES IN `sda' PACKAGE VERSION 1.2.0
 
 - requires now corpcor 1.6.0 and R version 2.10.0 
 - new function catscore()

@@ -1,0 +1,8 @@
+export(
+"catscore",
+"centroids",
+"plot.sda.ranking",
+"predict.sda",
+"sda",
+"sda.ranking"
+)
