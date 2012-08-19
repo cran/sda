@@ -1,8 +1,8 @@
-### centroids.R  (2011-06-26)
+### centroids.R  (2012-08-19)
 ###
 ###    Group centroids, variances, and correlations
 ###
-### Copyright 2008-2011 Korbinian Strimmer
+### Copyright 2008-2012 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -23,8 +23,8 @@
 
 
 
-centroids = function(x, L,  
-  var.groups=FALSE, centered.data=FALSE, shrink=FALSE, verbose=TRUE)
+centroids = function(x, L, lambda.var,
+  var.groups=FALSE, centered.data=FALSE, verbose=TRUE)
 {
   if (!is.matrix(x)) stop("Input x must be a matrix!")
   p = ncol(x)
@@ -36,6 +36,32 @@ centroids = function(x, L,
   samples = groups$samples
   cl.count = groups$cl.count
   cl.names = groups$cl.names
+
+  if( missing(lambda.var) )
+    auto.shrink = TRUE
+  else
+  {
+    auto.shrink = FALSE
+
+    if(var.groups)
+    {
+      if (length(lambda.var) == 1)
+        specified.lambda.var = rep(lambda.var[1], (cl.count+1))
+      else
+      {
+        if (length(lambda.var) != (cl.count+1) )
+          stop("You need to specify a vector with ", (cl.count+1), " shrinkage intensities, one for each group variance plus one for the pooled variance!")
+        specified.lambda.var = lambda.var
+      }
+    }
+    else
+      specified.lambda.var = lambda.var[1]
+
+    ifelse(specified.lambda.var > 1, 1, specified.lambda.var)
+    ifelse(specified.lambda.var < 0, 0, specified.lambda.var)
+
+  }
+
 
   if (verbose)
   {
@@ -57,14 +83,14 @@ centroids = function(x, L,
   if(var.groups)
   {
     v = array(0, dim=c(p, cl.count+1)) # storage for variances
-    if(shrink) attr(v, "lambda.var") = numeric(cl.count+1)
+    attr(v, "lambda.var") = numeric(cl.count+1)
     colnames(v) = c(cl.names, "(pooled)")
     rownames(v) = colnames(x)
   }
   else
   {
     v = array(0, dim=c(p, 1)) # store only pooled variances
-    if(shrink) attr(v, "lambda.var") = numeric(1)
+    attr(v, "lambda.var") = numeric(1)
     colnames(v) = c("(pooled)")
     rownames(v) = colnames(x)
   }  
@@ -80,15 +106,17 @@ centroids = function(x, L,
 
      if (var.groups)
      {
-       if(verbose) cat("Estimating variances (class #", k, ")\n", sep="")
-        if (shrink)
+        if(verbose) cat("Estimating variances (class #", k, ")\n", sep="")
+        if (auto.shrink)
         {
           vs = var.shrink(Xk, verbose=verbose)
-          v[,k] = as.vector(vs)
-          attr(v, "lambda.var")[k] = attr(vs, "lambda.var")
         }
         else
-          v[,k] = as.vector(var.shrink(Xk, lambda.var=0, verbose=FALSE))
+        {
+          vs = var.shrink(Xk, lambda.var=specified.lambda.var[k], verbose=verbose)
+        }
+        v[,k] = as.vector(vs)
+        attr(v, "lambda.var")[k] = attr(vs, "lambda.var")  
      }
   }
   
@@ -98,25 +126,31 @@ centroids = function(x, L,
   if (verbose) cat("Estimating variances (pooled across classes)\n")
   if (var.groups)
   {
-    if (shrink)
+    if (auto.shrink)
       v.pool = var.shrink(xc, verbose=verbose)
     else
-      v.pool = as.vector(var.shrink(xc, lambda.var=0, verbose=FALSE))
+      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[cl.count+1], verbose=FALSE)
+
     v[,cl.count+1] = v.pool*(n-1)/(n-cl.count) # correction factor
-    if (shrink) attr(v, "lambda.var")[cl.count+1] = attr(v.pool, "lambda.var")
+    attr(v, "lambda.var")[cl.count+1] = attr(v.pool, "lambda.var")
   }  
   else
   {
-    if (shrink)
+    if (auto.shrink)
       v.pool = var.shrink(xc, verbose=verbose)
     else
-      v.pool = as.vector(var.shrink(xc, lambda.var=0, verbose=FALSE))
+      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[1], verbose=FALSE)
     v[,1] = v.pool*(n-1)/(n-cl.count) # correction factor
-    if (shrink) attr(v, "lambda.var")[1] = attr(v.pool, "lambda.var")
+    attr(v, "lambda.var")[1] = attr(v.pool, "lambda.var")
   }
 
-  if(centered.data == FALSE) xc=NULL
+  if (auto.shrink)
+    attr(v, "lambda.var.estimated") = TRUE
+  else
+    attr(v, "lambda.var.estimated") = FALSE
 
+  if(centered.data == FALSE) xc=NULL
+  
   ##
 
   return( list(samples=samples, means=mu, variances=v, 

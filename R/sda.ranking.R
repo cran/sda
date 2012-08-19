@@ -1,8 +1,8 @@
-### sda.ranking.R  (2011-06-26)
+### sda.ranking.R  (2012-08-19)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
-### Copyright 2008-11 Miika Ahdesmaki, Verena Zuber and Korbinian Strimmer
+### Copyright 2008-12 Miika Ahdesmaki, Verena Zuber and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -24,7 +24,7 @@
 
 sda.ranking = function(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 {
-  cat = catscore(Xtrain, L, diagonal=diagonal, shrink=TRUE, verbose=verbose)
+  cat = catscore(Xtrain, L, diagonal=diagonal, verbose=verbose)
 
   cl.count = dim(cat)[2]
 
@@ -55,7 +55,7 @@ sda.ranking = function(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verb
     pval = fdr.out$pval # p-values
 
     # compute HC score for each p-value
-    HC = pvt.hcobj(pval)
+    HC = hc.score(pval) # function from fdrtool 
 
     ranking = cbind(idx, score[idx], cat[idx, , drop=FALSE], lfdr[idx], HC[idx])
     colnames(ranking) = c("idx", "score", colnames(cat), "lfdr", "HC")

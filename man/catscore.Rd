@@ -2,7 +2,7 @@
 \alias{catscore}
 
 
-\title{Estimate CAT scores and t-scores}
+\title{Estimate CAT Scores and t-Scores}
 
 \description{
   \code{catscore} computes  CAT scores
@@ -11,17 +11,22 @@
 }
 
 \usage{
-catscore(Xtrain, L, diagonal=FALSE, shrink=FALSE, verbose=TRUE)
+catscore(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
 }
 
 \arguments{
   \item{Xtrain}{A matrix  containing the training data set. Note that 
                 the rows correspond to observations and the columns
                 to variables.}
+  \item{lambda}{Shrinkage intensity for the correlation matrix. If not specified it is 
+    estimated from the data. \code{lambda=0} implies no shrinkage
+    and \code{lambda=1} complete shrinkage. }
+  \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
+    estimated from the data. \code{lambda.var=0} implies no shrinkage
+    and \code{lambda.var=1} complete shrinkage. }
   \item{L}{A factor with the class labels of the training samples. }
   \item{diagonal}{for \code{diagonal=FALSE} (the default) CAT scores are computed;
                 otherwise with \code{diagonal=TRUE} t-scores.}
-  \item{shrink}{Use empirical estimates or a shrinkage estimator for the CAT score.}
   \item{verbose}{Print out some info while computing.}
 }
 \details{CAT scores generalize conventional t-scores 
@@ -74,7 +79,7 @@ dim(Xtrain)
 # shrinkage t-score (DDA setting - no correlation) #
 ####################################################
 
-tstat = catscore(Xtrain, Ytrain, diagonal=TRUE, shrink=TRUE)
+tstat = catscore(Xtrain, Ytrain, diagonal=TRUE)
 dim(tstat)
 tstat[1:10,]
 
@@ -83,7 +88,7 @@ tstat[1:10,]
 # shrinkage CAT score (LDA setting - with correlation) #
 ########################################################
 
-cat = catscore(Xtrain, Ytrain, diagonal=FALSE, shrink=TRUE)
+cat = catscore(Xtrain, Ytrain, diagonal=FALSE)
 dim(cat)
 cat[1:10,]
 

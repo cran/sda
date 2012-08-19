@@ -1,8 +1,8 @@
-### sda.R  (2011-06-26)
+### sda.R  (2012-08-19)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
-### Copyright 2008-11 Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-12 Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -29,12 +29,11 @@ sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
 
   # shrinkage intensities
   regularization = rep(NA, 3)
-  names(regularization) = c("lambda.freqs", "lambda.var", "lambda")
-  regularization[3] = 1 # for diagonal=TRUE
+  names(regularization) = c("lambda", "lambda.var", "lambda.freqs")
+  regularization[1] = 1 # for diagonal=TRUE
 
 
-  tmp = centroids(Xtrain, L, var.groups=FALSE, centered.data=TRUE,
-    shrink=TRUE, verbose=verbose)
+  tmp = centroids(Xtrain, L, var.groups=FALSE, centered.data=TRUE, verbose=verbose)
   
   cl.count = ncol(tmp$means)-1    # number of classes
  
@@ -59,7 +58,7 @@ sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
 
   # class frequencies
   prior = freqs.shrink( nk, verbose=verbose )
-  regularization[1] = attr(prior, "lambda.freqs")
+  regularization[3] = attr(prior, "lambda.freqs")
   attr(prior, "lambda.freqs") = NULL
 
   # reference means
@@ -87,10 +86,10 @@ sda = function(Xtrain, L, diagonal=FALSE, verbose=TRUE)
   {
     if(verbose) cat("\nComputing inverse correlation matrix (pooled across classes)\n")
     pw = crossprod.powcor.shrink(xc, pw, alpha=-1, verbose=FALSE)
-    regularization[3] = attr(pw, "lambda")
+    regularization[1] = attr(pw, "lambda")
     attr(pw, "lambda") = NULL
     if(verbose) cat("Estimating optimal shrinkage intensity lambda (correlation matrix):", 
-                    round(regularization[3], 4), "\n")
+                    round(regularization[1], 4), "\n")
     
   }
 

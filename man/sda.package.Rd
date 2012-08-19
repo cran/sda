@@ -2,7 +2,7 @@
 \name{sda-package}
 \alias{sda-package}
 \docType{package}
-\title{The sda package}
+\title{The sda Package}
 
 \description{This package performs linear discriminant analysis (LDA)
 and diagonal discriminant analysis (DDA)

@@ -3,6 +3,18 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.2.2
+
+- centroids() function allows to specify the shrinkage intensity 
+  for estimating the variances.  Default is now shrinkage rather
+  empirical estimates.
+- catcscore() also includes options to specifify shrinkage intensities.
+  The default is now using shrinkage rather empirical estimates.
+- sda.ranking() now uses fdrtool to compute higher criticism scores
+- in the output of sda(), the order of entries in the regularization
+  vector is now lambda, lambda.var, lambda.freqs
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.2.1
 
 - NAMESPACE file added

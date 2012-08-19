@@ -4,7 +4,7 @@
 \title{Group Centroids and (Pooled) Variances}
 
 \usage{
-centroids(x, L, var.groups=FALSE, centered.data=FALSE, shrink=FALSE, verbose=TRUE)
+centroids(x, L, lambda.var, var.groups=FALSE, centered.data=FALSE, verbose=TRUE)
 }
 \description{
   \code{centroids} computes group centroids, the pooled mean 
@@ -16,18 +16,16 @@ centroids(x, L, var.groups=FALSE, centered.data=FALSE, shrink=FALSE, verbose=TRU
                 the rows are sample observations and the columns
                 are variables.}
   \item{L}{A factor with the group labels. }
+  \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
+    estimated from the data, see details below. \code{lambda.var=0} implies no shrinkage
+    and \code{lambda.var=1} complete shrinkage. }
   \item{var.groups}{Estimate group-specific variances.}
   \item{centered.data}{Return column-centered data matrix.}
-  \item{shrink}{Use empirical estimates or a shrinkage estimator for the variances.}
   \item{verbose}{Provide some messages while computing.}
 }
 \details{
-If option \code{shrink=TRUE} then the shrinkage estimators 
- \code{\link[corpcor:cov.shrink]{var.shrink}} from Opgen-Rhein and Strimmer (2007)
-and  \code{\link[corpcor:cov.shrink]{cor.shrink}} from Sch\"afer and Strimmer (2005) are used.
-
-Details on the algorithm for efficiently computing the power of the shrinkage correlation 
-matrix are given in Zuber and Strimmer (2009).
+As estimator of the variance we employ 
+ \code{\link[corpcor:cov.shrink]{var.shrink}} as described in Opgen-Rhein and Strimmer (2007). 
 }
 \value{
   \code{centroids} returns a list
@@ -56,19 +54,19 @@ X = as.matrix(iris[,1:4])
 Y = iris[,5]
 
 ## estimate centroids and empirical pooled variances
-centroids(X, Y)
+centroids(X, Y, lambda.var=0)
           
 ## also compute group-specific variances
-centroids(X, Y, var.groups=TRUE)
+centroids(X, Y, var.groups=TRUE, lambda.var=0)
    
 ## use shrinkage estimator for the variances
-centroids(X, Y, var.groups=TRUE, shrink=TRUE)
+centroids(X, Y, var.groups=TRUE)
 
 ## return centered data
 xc = centroids(X, Y, centered.data=TRUE)$centered.data
 apply(xc, 2, mean)
 
-## compute pooled inverse correlation matrix
+## useful, e.g., to compute the inverse pooled correlation matrix
 powcor.shrink(xc, alpha=-1)
 }
 \keyword{multivariate}
