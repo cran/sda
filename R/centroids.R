@@ -1,6 +1,6 @@
-### centroids.R  (2012-08-19)
+### centroids.R  (2012-11-24)
 ###
-###    Group centroids, variances, and correlations
+###    Group centroids and (pooled) variances
 ###
 ### Copyright 2008-2012 Korbinian Strimmer
 ###
@@ -129,7 +129,7 @@ centroids = function(x, L, lambda.var,
     if (auto.shrink)
       v.pool = var.shrink(xc, verbose=verbose)
     else
-      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[cl.count+1], verbose=FALSE)
+      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[cl.count+1], verbose=verbose)
 
     v[,cl.count+1] = v.pool*(n-1)/(n-cl.count) # correction factor
     attr(v, "lambda.var")[cl.count+1] = attr(v.pool, "lambda.var")
@@ -139,7 +139,7 @@ centroids = function(x, L, lambda.var,
     if (auto.shrink)
       v.pool = var.shrink(xc, verbose=verbose)
     else
-      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[1], verbose=FALSE)
+      v.pool = var.shrink(xc, lambda.var=specified.lambda.var[1], verbose=verbose)
     v[,1] = v.pool*(n-1)/(n-cl.count) # correction factor
     attr(v, "lambda.var")[1] = attr(v.pool, "lambda.var")
   }

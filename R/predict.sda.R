@@ -1,8 +1,8 @@
-### predict.sda.R  (2009-02-27)
+### predict.sda.R  (2012-11-23)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
-### Copyright 2008-2009 Korbinian Strimmer
+### Copyright 2008-2012 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -24,7 +24,7 @@
 
 
 
-predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
+predict.sda = function(object, Xtest, verbose=TRUE, ...)
 {
   if ( missing(object) ) {
     stop("A sda fit object must be supplied.")
@@ -44,20 +44,18 @@ predict.sda = function(object, Xtest, feature.idx, verbose=TRUE, ...)
          nrow(object$predcoef), ") and in test data (", 
          ncol(Xtest), ")", sep="")
 
-  if (missing(feature.idx)) feature.idx = 1:nrow(object$predcoef)
-
   probs = array(0, dim=c(ntest, cl.count) )
   score = numeric(cl.count) 
   yhat = integer(ntest)
 
-  pw = object$predcoef[feature.idx, 1:cl.count+cl.count, drop=FALSE]
-  ref = object$predcoef[feature.idx,(1:cl.count), drop=FALSE]
+  pw = object$predcoef[, 1:cl.count+cl.count, drop=FALSE]
+  ref = object$predcoef[,(1:cl.count), drop=FALSE]
 
   if (verbose) cat("Prediction uses", nrow(pw), "features.\n")
 
   for (i in 1:ntest)
   {
-    xs = Xtest[i, feature.idx]  # test sample
+    xs = Xtest[i, ]  # test sample
     for (k in 1:cl.count)
     {
        score[k] = crossprod(pw[, k], xs - ref[, k]) + log(freq[k])

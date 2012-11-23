@@ -1,4 +1,4 @@
-### catscore.R  (2012-08-19)
+### catscore.R  (2012-11-24)
 ###
 ###    Estimate CAT scores and t-scores
 ###
@@ -87,7 +87,7 @@ catscore = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
 
     if(verbose)
     {
-       if(lambda.var.estimated )
+       if(attr(cat, "lambda.estimated") )
          cat("Estimating optimal shrinkage intensity lambda (correlation matrix):", 
          round(attr(cat, "lambda"), 4), "\n")
        else

@@ -8,7 +8,7 @@
 }
 
 \usage{
-\method{predict}{sda}(object, Xtest, feature.idx, verbose=TRUE, ...)
+\method{predict}{sda}(object, Xtest, verbose=TRUE, ...)
 }
 
 \arguments{
@@ -16,8 +16,6 @@
   \item{Xtest}{A matrix containing the test data set. Note that 
                 the rows correspond to observations and the columns
                 to variables.}
-  \item{feature.idx}{A vector indicating which features to employ for prediction (if unspecified all
-                     features will be used).}
   \item{verbose}{Report shrinkage intensities (sda) and number of used features (predict.sda).}
    \item{...}{Additional arguments for generic predict.}
 }

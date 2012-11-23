@@ -1,4 +1,4 @@
-### sda.ranking.R  (2012-08-19)
+### sda.ranking.R  (2012-11-23)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
@@ -22,9 +22,9 @@
 ### MA 02111-1307, USA
 
 
-sda.ranking = function(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
+sda.ranking = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 {
-  cat = catscore(Xtrain, L, diagonal=diagonal, verbose=verbose)
+  cat = catscore(Xtrain, L, lambda, lambda.var, diagonal=diagonal, verbose=verbose)
 
   cl.count = dim(cat)[2]
 
@@ -97,7 +97,19 @@ plot.sda.ranking = function(x, top=40, ...)
   else
     colnames(x)[idx] = substr(cn, 5, nchar(cn))
 
-  if (is.null(rownames(x))) rownames(x) = x[, 1]
+  rn = rownames(x)
+  if (is.null(rn))
+  {
+    rownames(x) = x[, 1]
+  }
+  else
+  {
+    if(sum(duplicated(rn)) > 0)
+    {
+      warning("There are duplicated row names! These are converted to unique labels in the dotplot.")
+      rownames(x) = make.unique(rn)
+    }
+  }
 
   score = x[1:top, 2]
   DATA = as.data.frame.table( x[1:top, idx] )

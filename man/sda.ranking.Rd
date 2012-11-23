@@ -13,7 +13,7 @@
 }
 
 \usage{
-sda.ranking(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
+sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 \method{plot}{sda.ranking}(x, top=40, ...)
 }
 
@@ -22,6 +22,12 @@ sda.ranking(Xtrain, L, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
                 the rows correspond to observations and the columns
                 to variables.}
   \item{L}{A factor with the class labels of the training samples. }
+  \item{lambda}{Shrinkage intensity for the correlation matrix. If not specified it is 
+    estimated from the data. \code{lambda=0} implies no shrinkage
+    and \code{lambda=1} complete shrinkage. }
+  \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
+    estimated from the data. \code{lambda.var=0} implies no shrinkage
+    and \code{lambda.var=1} complete shrinkage. }
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
   \item{fdr}{compute FDR values and HC scores for each feature.}
   \item{plot.fdr}{Show plot with estimated FDR values.}

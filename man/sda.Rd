@@ -8,7 +8,7 @@
 }
 
 \usage{
-sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
+sda(Xtrain, L, lambda, lambda.var, shrink.freqs=TRUE, diagonal=FALSE, verbose=TRUE)
 }
 
 \arguments{
@@ -16,6 +16,14 @@ sda(Xtrain, L, diagonal=FALSE, verbose=TRUE)
                 the rows correspond to observations and the columns
                 to variables.}
   \item{L}{A factor with the class labels of the training samples. }
+  \item{lambda}{Shrinkage intensity for the correlation matrix. If not specified it is 
+    estimated from the data. \code{lambda=0} implies no shrinkage
+    and \code{lambda=1} complete shrinkage. }
+  \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
+    estimated from the data. \code{lambda.var=0} implies no shrinkage
+    and \code{lambda.var=1} complete shrinkage. }
+  \item{shrink.freqs}{Use shrinkage estimate of frequencies (default: \code{TRUE}). }
+ 
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
   \item{verbose}{Print out some info while computing.}
 }

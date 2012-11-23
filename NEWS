@@ -3,16 +3,26 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.2.3
+
+- plot.sda.ranking() now checks for duplicated row names.
+- feature.idx argument removed from predict.sda() function. 
+- sda.ranking() now allows to specify lambda and lambda.var
+  as in the catscore() function.
+- sda() also has parameters to set lambda and lambda.var,
+  as well as shrink.freqs=TRUE/FALSE.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.2.2
 
 - centroids() function allows to specify the shrinkage intensity 
-  for estimating the variances.  Default is now shrinkage rather
+  for estimating the variances.  Default is now shrinkage rather than
   empirical estimates.
-- catcscore() also includes options to specifify shrinkage intensities.
+- catscore() also includes options to specifify shrinkage intensities.
   The default is now using shrinkage rather empirical estimates.
 - sda.ranking() now uses fdrtool to compute higher criticism scores
 - in the output of sda(), the order of entries in the regularization
-  vector is now lambda, lambda.var, lambda.freqs
+  vector is now lambda, lambda.var, lambda.freqs.
 
 
               CHANGES IN `sda' PACKAGE VERSION 1.2.1
