@@ -14,7 +14,7 @@
 
 \usage{
 sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
-\method{plot}{sda.ranking}(x, top=40, ...)
+\method{plot}{sda.ranking}(x, top=40, arrow.col="blue", ...)
 }
 
 \arguments{
@@ -34,6 +34,7 @@ sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FA
   \item{verbose}{Print out some info while computing.}
   \item{x}{An "sda.ranking" object -- this is produced by the sda.ranking() function.}
   \item{top}{The number of top-ranking features shown in the plot (default: 40).}
+  \item{arrow.col}{Color of the arrows in the plot (default is \code{"blue"}).}
    \item{...}{Additional arguments for generic plot.}
 }
 \details{

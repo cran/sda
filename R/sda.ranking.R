@@ -1,8 +1,9 @@
-### sda.ranking.R  (2012-11-23)
+### sda.ranking.R  (2013-04-03)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
-### Copyright 2008-12 Miika Ahdesmaki, Verena Zuber and Korbinian Strimmer
+### Copyright 2008-13 Miika Ahdesmaki, Verena Zuber, Sebastian Gibb,
+### and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -76,50 +77,122 @@ sda.ranking = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, 
 }
 
 
-plot.sda.ranking = function(x, top=40, ...)
+plot.sda.ranking = function(x, top=40, arrow.col="blue", ...) 
 {
-  if ( class(x) != "sda.ranking" )
-    stop ("sda.ranking x needed as input!")
+  if (class(x) != "sda.ranking") 
+  {
+    stop("sda.ranking x needed as input!")
+  }
 
   cl.count = attr(x, "cl.count")
   diagonal = attr(x, "diagonal")
-  if (diagonal) 
-    xlab = "t-Scores (Centroid vs. Pooled Mean)"
-  else 
-    xlab = "Correlation-Adjusted t-Scores (Centroid vs. Pooled Mean)"
 
-  top = min( nrow(x), top ) # just to be sure ...
+  top = min(nrow(x), top) # just to be sure ...
 
   idx = 2+(1:cl.count)
-  cn = colnames(x)[idx]
-  if(diagonal)
-    colnames(x)[idx] = substr(cn, 3, nchar(cn))
-  else
-    colnames(x)[idx] = substr(cn, 5, nchar(cn))
 
-  rn = rownames(x)
+  cn = colnames(x)[idx]
+  rn = rownames(x)[1:top]
+
+  if (diagonal) 
+  {
+    cn = substr(cn, 3, nchar(cn))
+    xlab = "t-Scores (Centroid vs. Pooled Mean)"
+  } 
+  else 
+  {
+    cn = substr(cn, 5, nchar(cn))
+    xlab = "Correlation-Adjusted t-Scores (Centroid vs. Pooled Mean)"
+  }
+
   if (is.null(rn))
   {
-    rownames(x) = x[, 1]
+    rn = x[1:top, 1]
   }
   else
   {
-    if(sum(duplicated(rn)) > 0)
+    if (any(duplicated(rn))) 
     {
       warning("There are duplicated row names! These are converted to unique labels in the dotplot.")
-      rownames(x) = make.unique(rn)
+      rn = make.unique(rn)
     }
   }
 
-  score = x[1:top, 2]
-  DATA = as.data.frame.table( x[1:top, idx] )
+  xBreaks = pretty(range(x[1:top, idx]))
+  dXlim = sum(diff(xBreaks))
+  ylim = c(0, top+1)
 
-  require("lattice")
-  dotplot(reorder(Var1,rep(score, cl.count )) ~ Freq | Var2, 
-    data = DATA, origin = 0, type = c("p", "h"), 
-    main = paste("The", top, "Top Ranking Features"), 
-    xlab = xlab, 
-    layout=c(cl.count,1), ...) 
+  oldPar = par(no.readonly=TRUE)
+  on.exit(par(oldPar[c("mar", "mgp", "las", "xaxs", "yaxs")]))
+
+  par(mai=c(0.7, max(strwidth(as.character(rn), units="inches"))+0.25, 0.9,
+            0.25), mgp=c(3, 0.5, 0), las=1, yaxs="i", xaxs="i")
+
+  fullXlim = c(0, dXlim * cl.count)
+
+  ## plot area
+  plot(NA, type="n", xaxt="n", yaxt="n", xlim=fullXlim, ylim=ylim,
+       main="", xlab="", ylab="")
+
+  ## title
+  title(main=paste("The", top, "Top Ranking Features"),
+        line=3)
+  ## xlab
+  title(xlab=xlab, line=2)
+
+  xlimLeft = dXlim*(0:(cl.count-1))
+  xZero = abs(xBreaks[1]) + xlimLeft
+
+  ## border
+  abline(v=xlimLeft[-1])
+
+  ## scale y-axis labels if needed
+  yusr = diff(par("usr")[3:4])
+  sh = sum(strheight(as.character(rn), units="user"))*1.05
+
+  if (yusr < sh)
+  {
+    cex = yusr/sh
+  }
+  else
+  {
+    cex = par("cex.axis")
+  }
+
+  ## y-axis
+  axis(side=2, at=top:1, labels=rn[1:top], tick=FALSE, cex.axis=cex)
+
+  ## x-axis bottom
+  xLabels = head(xBreaks[-1], -1)
+  nLabels = length(xLabels)
+  xAxisLabels = rep(xLabels, times=cl.count)
+  at = xAxisLabels + rep(xZero, each=nLabels)
+  above = rep(as.logical(1:cl.count %% 2), each=nLabels)
+
+  ## x-axis above
+  axis(side=1, at=at[!above], labels=rep("", sum(!above)))
+  axis(side=1, at=at[above], labels=xAxisLabels[above])
+
+  ## x-axis bottom
+  axis(side=3, at=at[above], labels=rep("", sum(above)))
+  axis(side=3, at=at[!above], labels=xAxisLabels[!above])
+
+  ## title
+  mtext(cn, side=3, at=xZero, line=1.5, col=1, font=2)
+
+  ## horizontal gray lines
+  abline(h=1:top, col="#808080", lwd=0.25)
+
+  ## vertical gray lines
+  abline(v=xZero, col="#808080", lty=3, lwd=0.25)
+
+  ## values
+  values = x[1:top, idx]
+  x0 = rep(xZero, each=top)
+  x1 = values + x0
+  y0 = y1 = rep(top:1, times=cl.count)
+  arrows(x0=x0, y0=y0, x1=x1, y1=y1, length=0, col=arrow.col)
+  points(x1, y1, col=arrow.col, pch=19)
 }
 
 

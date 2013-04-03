@@ -8,7 +8,7 @@
 }
 
 \usage{
-sda(Xtrain, L, lambda, lambda.var, shrink.freqs=TRUE, diagonal=FALSE, verbose=TRUE)
+sda(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verbose=TRUE)
 }
 
 \arguments{
@@ -22,7 +22,9 @@ sda(Xtrain, L, lambda, lambda.var, shrink.freqs=TRUE, diagonal=FALSE, verbose=TR
   \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
     estimated from the data. \code{lambda.var=0} implies no shrinkage
     and \code{lambda.var=1} complete shrinkage. }
-  \item{shrink.freqs}{Use shrinkage estimate of frequencies (default: \code{TRUE}). }
+  \item{lambda.freqs}{Shrinkage intensity for the frequencies. If not specified it is 
+    estimated from the data. \code{lambda.freqs=0} implies no shrinkage (i.e. empirical frequencies)
+    and \code{lambda.freqs=1} complete shrinkage (i.e. uniform frequencies). }
  
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
   \item{verbose}{Print out some info while computing.}

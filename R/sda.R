@@ -1,8 +1,8 @@
-### sda.R  (2012-11-24)
+### sda.R  (2013-04-03)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
-### Copyright 2008-12 Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-13 Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,7 +22,7 @@
 ### MA 02111-1307, USA
 
 
-sda = function(Xtrain, L, lambda, lambda.var, shrink.freqs=TRUE, diagonal=FALSE, verbose=TRUE)
+sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verbose=TRUE)
 {
   if (!is.matrix(Xtrain)) stop("Training data must be given as matrix!")
   if (missing(L)) stop("Class labels are missing!")
@@ -57,19 +57,10 @@ sda = function(Xtrain, L, lambda, lambda.var, shrink.freqs=TRUE, diagonal=FALSE,
   #############################################################
 
   # class frequencies
-  if(shrink.freqs) # shrinkage estimates
-  {
-    prior = freqs.shrink( nk, verbose=verbose )
-    regularization[3] = attr(prior, "lambda.freqs")
-    attr(prior, "lambda.freqs") = NULL
-  }
-  else # empirical estimates
-  {
-    prior = freqs.empirical( nk )
-    if(verbose) cat("Specified shrinkage intensity lambda.freq (frequencies): 0\n")
-    regularization[3] = 0
-  }
-
+  prior = freqs.shrink( nk, lambda.freqs=lambda.freqs, verbose=verbose )
+  regularization[3] = attr(prior, "lambda.freqs")
+  attr(prior, "lambda.freqs") = NULL
+  
   # reference means
   ref = array(0, dim=c(p, cl.count))
   colnames(ref) = paste("ref.", colnames(mu), sep="")

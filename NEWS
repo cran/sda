@@ -3,6 +3,16 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.2.4
+
+- License file removed.
+- Dependencies updated.
+- plot.sda.ranking() is not based on "lattice" graphics any more
+  (new code contributed by Sebastian Gibb).
+- sda() now allows to specify the shrinkage intensity for the 
+  class frequencies.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.2.3
 
 - plot.sda.ranking() now checks for duplicated row names.
