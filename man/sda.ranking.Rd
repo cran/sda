@@ -80,7 +80,7 @@ Bioinformatics 25: 2700-2707.
 Preprint available from \url{http://arxiv.org/abs/0902.0751}.}
 
 \author{
-  Miiika Ahdesm\"aki, Verena Zuber and Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miika Ahdesm\"aki, Verena Zuber, Sebastian Gibb, and Korbinian Strimmer (\url{http://strimmerlab.org}).
 }
 \seealso{\code{\link{catscore}}, \code{\link{sda}}, \code{\link{predict.sda}}.}
 

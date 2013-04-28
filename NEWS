@@ -3,6 +3,14 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.3.0
+
+- predict.sda() has been rewritten and is now *much* faster for large 
+  numbers of test samples.
+- the format of object returned by sda() has changed for more efficient
+  prediction.  Note that it is *not* compatible with earlier versions.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.2.4
 
 - License file removed.

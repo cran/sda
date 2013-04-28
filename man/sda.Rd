@@ -50,7 +50,8 @@ are obtained analytically without resorting to computer intensive resampling.
 
   \item{regularization}{a vector containing the three estimated shrinkage intensities,}
    \item{prior}{the estimated class frequencies,}
-   \item{predcoef}{matrix containing the coefficients used for prediction}
+   \item{alpha}{vector containing the intercepts used for prediction,}
+   \item{beta}{matrix containing the coefficients used for prediction.}
 }
 
 \references{

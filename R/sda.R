@@ -1,4 +1,4 @@
-### sda.R  (2013-04-03)
+### sda.R  (2013-04-28)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
@@ -61,18 +61,9 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
   regularization[3] = attr(prior, "lambda.freqs")
   attr(prior, "lambda.freqs") = NULL
   
-  # reference means
-  ref = array(0, dim=c(p, cl.count))
-  colnames(ref) = paste("ref.", colnames(mu), sep="")
-  rownames(ref) = rownames(mu)
-  for (k in 1:cl.count)
-  {
-    ref[,k] = (mu[,k]+mup)/2
-  }
-
   # prediction weights
   pw = array(0, dim=c(p, cl.count) )
-  colnames(pw) = paste("pw.", colnames(mu), sep="")
+  colnames(pw) = colnames(mu)
   rownames(pw) = rownames(mu)
 
   for (k in 1:cl.count)
@@ -80,7 +71,6 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
     diff = mu[,k]-mup  
     pw[,k] = diff/sc
   }
-
 
   if(!diagonal)
   {
@@ -104,11 +94,17 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
     pw[,k] = pw[,k]/sc
   }
 
+  alpha = log(prior)
+  for (k in 1:cl.count) {
+    refk = (mu[,k]+mup)/2
+    alpha[k] = alpha[k]-crossprod(pw[,k], refk) 
+  }
+
 
   ############################################################# 
 
   out = list(regularization=regularization, prior=prior, 
-             predcoef=cbind(ref, pw))
+             alpha=alpha, beta=t(pw))
   class(out)="sda"
 
   return (out)

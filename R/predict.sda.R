@@ -1,8 +1,8 @@
-### predict.sda.R  (2012-11-23)
+### predict.sda.R  (2013-04-28)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
-### Copyright 2008-2012 Korbinian Strimmer
+### Copyright 2008-2013 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,62 +22,48 @@
 ### MA 02111-1307, USA
 
 
-
-
-predict.sda = function(object, Xtest, verbose=TRUE, ...)
+predict.sda = function (object, Xtest, verbose = TRUE, ...) 
 {
-  if ( missing(object) ) {
-    stop("A sda fit object must be supplied.")
-  }
-
-  if ( missing(Xtest) ) {
-    stop("A new data to predict must be supplied.")
-  }
-  
-  if (!is.matrix(Xtest)) stop("Test data must be given as matrix!")
-  ntest = nrow(Xtest)
-  freq = object$prior
-  cl.count = length(freq)
-
-  if (ncol(Xtest) != nrow(object$predcoef))
-    stop("Different number of predictors in sda object (", 
-         nrow(object$predcoef), ") and in test data (", 
-         ncol(Xtest), ")", sep="")
-
-  probs = array(0, dim=c(ntest, cl.count) )
-  score = numeric(cl.count) 
-  yhat = integer(ntest)
-
-  pw = object$predcoef[, 1:cl.count+cl.count, drop=FALSE]
-  ref = object$predcoef[,(1:cl.count), drop=FALSE]
-
-  if (verbose) cat("Prediction uses", nrow(pw), "features.\n")
-
-  for (i in 1:ntest)
-  {
-    xs = Xtest[i, ]  # test sample
-    for (k in 1:cl.count)
-    {
-       score[k] = crossprod(pw[, k], xs - ref[, k]) + log(freq[k])
+    if (missing(object)) {
+        stop("A sda fit object must be supplied.")
     }
-    probs[i,] = score2prob(score)
-    yhat[i] = which.max(score)
-  }
-  probs = zapsmall(probs)
-  attr(yhat, "levels") = names(freq)
-  class(yhat)= "factor"
-  colnames(probs) = names(freq)
-  rownames(probs) = rownames(Xtest)
+    if (missing(Xtest)) {
+        stop("A new data to predict must be supplied.")
+    }
+    if (!is.matrix(Xtest)) 
+        stop("Test data must be given as matrix!")
+    ntest = nrow(Xtest)
 
-  return(list(class=yhat, posterior=probs) )
+    alpha = object$alpha
+    cl.count = length(alpha)
+
+    if (ncol(Xtest) != ncol(object$beta)) 
+        stop("Different number of predictors in sda object (", 
+            ncol(object$beta), ") and in test data (", ncol(Xtest), 
+            ")", sep = "")
+     
+    beta = object$beta
+    if (verbose) 
+        cat("Prediction uses", ncol(beta), "features.\n")
+      
+    probs = t(tcrossprod(beta, Xtest) + alpha)
+    probs = exp(probs - max.col.value(probs))  #probs = exp(probs - apply(probs, 1, max))
+    probs = zapsmall( probs / rowSums(probs) )
+
+    yhat = max.col(probs) # yhat = apply(probs, 1, which.max)
+
+    attr(yhat, "levels") = names(alpha)
+    class(yhat) = "factor"
+    colnames(probs) = names(alpha)
+    rownames(probs) = rownames(Xtest)
+    return(list(class = yhat, posterior = probs))
 }
 
-score2prob = function(x)
+# by Sebastian Gibb
+max.col.value = function(x)
 {
-   x = x-max(x)
-   x = exp(x)
-   x = x/sum(x)
-
-   return(x)
+  do.call(pmax, lapply(1:ncol(x), function(i)x[,i]))
 }
+
+
 

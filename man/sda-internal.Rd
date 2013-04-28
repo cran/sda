@@ -1,6 +1,6 @@
 \name{sda-internal}
 
-\alias{score2prob}
+\alias{max.col.value}
 \alias{pvt.groups}
 
 
