@@ -1,4 +1,4 @@
-### sda.ranking.R  (2013-04-03)
+### sda.ranking.R  (2013-08-31)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
@@ -23,13 +23,28 @@
 ### MA 02111-1307, USA
 
 
-sda.ranking = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
+sda.ranking = function(Xtrain, L, lambda, lambda.var, lambda.freqs, 
+ ranking.score=c("entropy", "avg", "max"), 
+ diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 {
-  cat = catscore(Xtrain, L, lambda, lambda.var, diagonal=diagonal, verbose=verbose)
+  ranking.score = match.arg(ranking.score)
+
+  cat = catscore(Xtrain, L, 
+     lambda=lambda, lambda.var=lambda.var, lambda.freqs=lambda.freqs,
+      diagonal=diagonal, verbose=verbose)
 
   cl.count = dim(cat)[2]
+  freqs=attr(cat, "freqs")
 
-  score = apply(cat^2, 1, sum) # sum of squared CAT-scores
+  if (ranking.score == "entropy")
+    score = as.vector(cat^2 %*% as.matrix(1-freqs))  # weighted sum of squared CAT scores
+
+  if( ranking.score == "avg")
+    score = apply(cat^2, 1, sum)/cl.count # average of squared CAT-scores
+
+  if( ranking.score == "max")
+    score = apply(cat^2, 1, max)          # max of squared CAT-scores
+
   names(score) = rownames(cat)
   idx = order(score, decreasing = TRUE)
 

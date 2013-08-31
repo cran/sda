@@ -1,4 +1,4 @@
-### sda.R  (2013-04-28)
+### sda.R  (2013-08-31)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
@@ -33,19 +33,22 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
   regularization[1] = 1 # for diagonal=TRUE
 
 
-  tmp = centroids(Xtrain, L, lambda.var, var.groups=FALSE, centered.data=TRUE, verbose=verbose)
+  tmp = centroids(Xtrain, L, lambda.var, lambda.freqs, var.groups=FALSE, centered.data=TRUE, verbose=verbose)
   
   cl.count = ncol(tmp$means)-1    # number of classes
- 
+  n = sum(tmp$samples)            # number of samples
+  p = nrow(tmp$means)             # number of features
+
   mu = tmp$means[,1:cl.count]
   mup = tmp$means[,cl.count+1]
-  s2 = tmp$variances[,1]
-  sc = sqrt(s2)  
+  sc = sqrt(tmp$variances[,1])  
   regularization[2] = attr(tmp$variances, "lambda.var")[1]
 
-  nk = tmp$samples       # samples in class k
-  n = sum(nk)            # number of samples
-  p = nrow(mu)           # number of features
+  # class frequencies
+  freqs = tmp$freqs
+  regularization[3] = attr(freqs, "lambda.freqs")
+  attr(freqs, "lambda.freqs") = NULL
+  attr(freqs, "lambda.freqs.estimated") = NULL
  
   xc = tmp$centered.data # to compute inverse pooled correlation matrix
 
@@ -55,11 +58,6 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
   ############################################################# 
   # compute coefficients for prediction 
   #############################################################
-
-  # class frequencies
-  prior = freqs.shrink( nk, lambda.freqs=lambda.freqs, verbose=verbose )
-  regularization[3] = attr(prior, "lambda.freqs")
-  attr(prior, "lambda.freqs") = NULL
   
   # prediction weights
   pw = array(0, dim=c(p, cl.count) )
@@ -94,7 +92,7 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
     pw[,k] = pw[,k]/sc
   }
 
-  alpha = log(prior)
+  alpha = log(freqs)
   for (k in 1:cl.count) {
     refk = (mu[,k]+mup)/2
     alpha[k] = alpha[k]-crossprod(pw[,k], refk) 
@@ -103,7 +101,7 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
 
   ############################################################# 
 
-  out = list(regularization=regularization, prior=prior, 
+  out = list(regularization=regularization, freqs=freqs, 
              alpha=alpha, beta=t(pw))
   class(out)="sda"
 

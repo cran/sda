@@ -11,7 +11,7 @@
 }
 
 \usage{
-catscore(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
+catscore(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verbose=TRUE)
 }
 
 \arguments{
@@ -25,6 +25,9 @@ catscore(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
   \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
     estimated from the data. \code{lambda.var=0} implies no shrinkage
     and \code{lambda.var=1} complete shrinkage. }
+  \item{lambda.freqs}{Shrinkage intensity for the frequencies. If not specified it is 
+    estimated from the data. \code{lambda.freqs=0} implies no shrinkage (i.e. empirical frequencies)
+    and \code{lambda.freqs=1} complete shrinkage (i.e. uniform frequencies). }
   \item{diagonal}{for \code{diagonal=FALSE} (the default) CAT scores are computed;
                 otherwise with \code{diagonal=TRUE} t-scores.}
   \item{verbose}{Print out some info while computing.}
@@ -36,6 +39,9 @@ CAR scores provide a decomposition of Hotelling's T^2 statistic.
 
 CAT scores for two classes are described in Zuber and Strimmer (2009),
 for the multi-class case see Ahdesm\"aki and Strimmer (2010).
+
+The scale factors for t-scores and CAT-scores are computed from the estimated frequencies
+(for empirical scale factors set  \code{lambda.freqs=0}).
 }
 
 \value{

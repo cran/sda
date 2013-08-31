@@ -13,7 +13,9 @@
 }
 
 \usage{
-sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
+sda.ranking(Xtrain, L, lambda, lambda.var, lambda.freqs,
+  ranking.score=c("entropy", "avg", "max"), 
+  diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 \method{plot}{sda.ranking}(x, top=40, arrow.col="blue", ...)
 }
 
@@ -28,7 +30,11 @@ sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FA
   \item{lambda.var}{Shrinkage intensity for the variances. If not specified it is 
     estimated from the data. \code{lambda.var=0} implies no shrinkage
     and \code{lambda.var=1} complete shrinkage. }
+  \item{lambda.freqs}{Shrinkage intensity for the frequencies. If not specified it is 
+    estimated from the data. \code{lambda.freqs=0} implies no shrinkage (i.e. empirical frequencies)
+    and \code{lambda.freqs=1} complete shrinkage (i.e. uniform frequencies). }
   \item{diagonal}{Chooses between LDA (default, \code{diagonal=FALSE}) and DDA (\code{diagonal=TRUE}).}
+  \item{ranking.score}{how to compute the summary score for each variable from the CAT scores of all classes - see Details.}
   \item{fdr}{compute FDR values and HC scores for each feature.}
   \item{plot.fdr}{Show plot with estimated FDR values.}
   \item{verbose}{Print out some info while computing.}
@@ -39,18 +45,33 @@ sda.ranking(Xtrain, L, lambda, lambda.var, diagonal=FALSE, fdr=TRUE, plot.fdr=FA
 }
 \details{
 For each predictor variable and centroid a shrinkage CAT scores of the mean versus
-the pooled mean is computed.  The overall ranking of a feature is determined
-by the sum of the squared cat scores across all centroids.
-For the diagonal case (LDA) the (shrinkage) CAT score reduces to the (shrinkage) t-score.  Thus in the two-class diagonal case the feature are simply ranked according to the
-(shrinkage) t-scores.
+the pooled mean is computed.   If there are only two classes the CAT score vs. the pooled
+mean reduces to the CAT score between the two group means.
+Moreover, in the diagonal case (LDA) the (shrinkage) CAT score reduces to the (shrinkage) t-score.
+
+The overall ranking of a feature is determine by computing a summary score from the CAT scores.
+This is controlled by the option \code{ranking.score}.  The default setting
+(\code{ranking.score="entropy"}) uses mutual information
+between the response and the respective predictors (\code{ranking.score}) for ranking.  This is equivalent to
+a weighted sum of squared CAT scores across the classes.  Another possibility is to employ
+the average of the squared CAT scores for ranking (as suggested in Ahdesm\"aki and Strimmer 2010) 
+by setting \code{ranking.score="avg"}.  A third option is to use the maximum of the squared CAT scores across groups (similarly as in the PAM algorithm) via setting \code{ranking.score="max"}.
+Note that in the case of two classes all three options are equivalent and
+ lead to identical scores.  Thus, the choice of \code{ranking.score} is important only
+in the multi-class setting.  In the two-class case the features are simply ranked according to the
+(shrinkage) squared CAT-scores (or t-scores, if there is no correlation among predictors).
+
+The current default approach is to use ranking by mutual information (i.e. relative entropy
+between full model vs. model without predictor) and to use shrinkage estimators of frequencies.
+In order to reproduce exactly the ranking computed by previous versions (1.1.0 to 1.3.0) of the \code{sda} package set the options  \code{ranking.score="avg"} and \code{lambda.freqs=0}.
 
 Calling \code{sda.ranking} is step 1 in a classification analysis with the
 sda package.  Steps 2 and 3 are 
 \code{\link{sda}} and \code{\link{predict.sda}}
 
-See Ahdesm\"aki and Strimmer (2010) for details on multi-class CAT scores,
-Zuber and Strimmer (2009) for CAT scores in general.  For shrinkage t scores
-see Opgen-Rhein and Strimmer (2007). 
+See Zuber and Strimmer (2009) for CAT scores in general, and 
+Ahdesm\"aki and Strimmer (2010) for details on multi-class CAT scores.
+For shrinkage t scores see Opgen-Rhein and Strimmer (2007). 
 }
 
 \value{

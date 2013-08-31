@@ -3,6 +3,27 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.3.1
+
+- centroids() now also estimates class frequencies (in addition to
+  simply reporting the samples size per class). The frequencies are
+  estimated using a shrinkage approach (set lambda.freqs=0 for empirical
+  estimates).  The pooled mean is now computed using the estimated
+  frequencies.
+
+- catscore() now has a lambda.freqs argument and uses shrinkage
+  estimates of class frequencies to compute the scaling factor
+  (to use empirical scaling factors set lambda.freqs=0).
+
+- the estimated frequencies returned by sda() are now contained
+  in the variable "freqs" (which previously was called "prior").
+
+- in sda.ranking() there is now also a lambda.freqs argument
+
+- in addition, sda.ranking() now offers three types of summary 
+  statistics for ranking variables in the multi-class case.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.3.0
 
 - predict.sda() has been rewritten and is now *much* faster for large 

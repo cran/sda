@@ -1,8 +1,8 @@
-### catscore.R  (2012-11-24)
+### catscore.R  (2013-08-31)
 ###
 ###    Estimate CAT scores and t-scores
 ###
-### Copyright 2008-12 Verena Zuber, Miika Ahdesmaki and Korbinian Strimmer
+### Copyright 2008-13 Verena Zuber, Miika Ahdesmaki and Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -22,7 +22,7 @@
 ### MA 02111-1307, USA
 
 
-catscore = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
+catscore = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verbose=TRUE)
 {
   if (!is.matrix(Xtrain)) stop("Training data must be given as matrix!")
   if (missing(L)) stop("Class labels are missing!")
@@ -35,28 +35,33 @@ catscore = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
       cat("Computing cat scores (centroid vs. pooled mean) for feature ranking\n\n")
   }
 
-  tmp = centroids(Xtrain, L, lambda.var=lambda.var, var.groups=FALSE, centered.data=TRUE, verbose=verbose)
+  tmp = centroids(Xtrain, L, lambda.var=lambda.var, lambda.freqs=lambda.freqs, 
+          var.groups=FALSE, centered.data=TRUE, verbose=verbose)
 
   cl.count = ncol(tmp$means)-1    # number of classes
-  
+  n = sum(tmp$samples)            # number of samples
+  p = nrow(tmp$means)             # number of variables
+ 
   mu = tmp$means[,1:cl.count]
   mup = tmp$means[,cl.count+1]
-  s2 = tmp$variances[,1]
-  sc = sqrt(s2)
+  sc = sqrt(tmp$variances[,1])
   lambda.var = attr(tmp$variances,"lambda.var")[1]
   lambda.var.estimated = attr(tmp$variances,"lambda.var.estimated")
  
-  nk = tmp$samples       # samples in class k
-  n = sum(nk)            # number of samples
-  p = nrow(mu)           # number of features
-  
+  # get class frequencies
+  freqs = tmp$freqs
+  lambda.freqs = attr(freqs, "lambda.freqs")
+  lambda.freqs.estimated = attr(freqs, "lambda.freqs.estimated")
+  attr(freqs, "lambda.freqs") = NULL
+  attr(freqs, "lambda.freqs.estimated") = NULL
+ 
   xc = tmp$centered.data # to compute pooled correlation matrix
 
   rm(tmp)
 
 
   ############################################################# 
-  # compute coefficients for feature ranking
+  # compute (correlation-adjusted) t-scores for each variable
   #############################################################
 
   cat = array(0, dim=c(p, cl.count))
@@ -67,7 +72,10 @@ catscore = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
   rownames(cat) = rownames(mu)
   
   # first compute t-scores (centroid vs. pooled mean)
-  m = sqrt(1/nk - 1/n) # note the minus sign!
+  
+  # scaling factor
+  m = sqrt( (1-freqs)/freqs/n )   # same as sqrt(1/nk - 1/n) for empirical freqs
+
   for (k in 1:cl.count)
   {
     diff = mu[,k]-mup
@@ -96,6 +104,10 @@ catscore = function(Xtrain, L, lambda, lambda.var, diagonal=FALSE, verbose=TRUE)
     }
 
   }
+
+  attr(cat, "lambda.freqs") = lambda.freqs
+  attr(cat, "lambda.freqs.estimated") = lambda.freqs.estimated 
+  attr(cat, "freqs") = freqs 
 
   return(cat)
 }

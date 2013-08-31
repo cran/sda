@@ -1,8 +1,8 @@
-### centroids.R  (2012-11-24)
+### centroids.R  (2013-08-31)
 ###
 ###    Group centroids and (pooled) variances
 ###
-### Copyright 2008-2012 Korbinian Strimmer
+### Copyright 2008-2013 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -23,7 +23,7 @@
 
 
 
-centroids = function(x, L, lambda.var,
+centroids = function(x, L, lambda.var, lambda.freqs,
   var.groups=FALSE, centered.data=FALSE, verbose=TRUE)
 {
   if (!is.matrix(x)) stop("Input x must be a matrix!")
@@ -70,6 +70,11 @@ centroids = function(x, L, lambda.var,
     cat("Number of classes:", cl.count, "\n\n")
   }
 
+  # estimate class frequencies
+  lambda.freqs.estimated = missing(lambda.freqs)
+  freqs = freqs.shrink( samples, lambda.freqs=lambda.freqs, verbose=verbose )
+  attr(freqs, "lambda.freqs.estimated") = lambda.freqs.estimated
+ 
   
   # setup arrays
   mu = array(0, dim=c(p, cl.count+1))
@@ -96,11 +101,13 @@ centroids = function(x, L, lambda.var,
   }  
 
   # compute means and variance in each group
+  mu.pooled = rep(0, p)
   for (k in 1:cl.count)
   {
      idx = groups$idx[,k]
      Xk = x[ idx, ,drop = FALSE]
      mu[,k] = colMeans(Xk)
+     mu.pooled = mu.pooled + freqs[k]*mu[,k]
 
      xc[idx,] = sweep(Xk, 2, mu[,k]) # center data
 
@@ -119,10 +126,10 @@ centroids = function(x, L, lambda.var,
         attr(v, "lambda.var")[k] = attr(vs, "lambda.var")  
      }
   }
-  
-  # compute pooled mean and variance
-  mu[,cl.count+1] = colMeans(x) # pooled mean
+  mu[,cl.count+1] = mu.pooled
  
+  
+  # compute variance
   if (verbose) cat("Estimating variances (pooled across classes)\n")
   if (var.groups)
   {
@@ -153,7 +160,7 @@ centroids = function(x, L, lambda.var,
   
   ##
 
-  return( list(samples=samples, means=mu, variances=v, 
+  return( list(samples=samples, freqs= freqs, means=mu, variances=v, 
      centered.data=xc))
 }
 
