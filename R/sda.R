@@ -1,4 +1,4 @@
-### sda.R  (2013-08-31)
+### sda.R  (2013-11-19)
 ###
 ###    Shrinkage discriminant analysis (training the classifier)
 ###
@@ -39,8 +39,8 @@ sda = function(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verb
   n = sum(tmp$samples)            # number of samples
   p = nrow(tmp$means)             # number of features
 
-  mu = tmp$means[,1:cl.count]
-  mup = tmp$means[,cl.count+1]
+  mu = tmp$means[,1:cl.count, drop=FALSE]
+  mup = tmp$means[,cl.count+1, drop=FALSE]
   sc = sqrt(tmp$variances[,1])  
   regularization[2] = attr(tmp$variances, "lambda.var")[1]
 

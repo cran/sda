@@ -1,4 +1,4 @@
-### predict.sda.R  (2013-04-28)
+### predict.sda.R  (2013-11-21)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
@@ -62,7 +62,7 @@ predict.sda = function (object, Xtest, verbose = TRUE, ...)
 # by Sebastian Gibb
 max.col.value = function(x)
 {
-  do.call(pmax, lapply(1:ncol(x), function(i)x[,i]))
+  return(x[cbind(1:nrow(x), max.col(x, ties.method="first"))])
 }
 
 

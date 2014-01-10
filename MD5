@@ -1,11 +1,11 @@
-356b36227cbca152a06742e8741c68a6 *DESCRIPTION
+9527115e6d641d5af0216ffbeae1170d *DESCRIPTION
 a73a9586a86cdd9a4b2ec9470687e807 *NAMESPACE
-b52b1896057de6ec1d212b046ccad292 *NEWS
+dc75a05dd1b482d2a095ecfa35b314aa *NEWS
 84f16d3321d9705403e6e39d8cb2b6d3 *R/catscore.R
 99b43c34dcc718d8681b01c9211c14ee *R/centroids.R
-f2a12172feba73d27454db2dde9099f0 *R/predict.sda.R
-64de242abde9f9f6155d5ac741d91afa *R/sda.R
-985b090d2cb04feb14601e99ef85eb76 *R/sda.ranking.R
+40fcd6c579d2a109149d26fc5dfe0d6f *R/predict.sda.R
+abb2e7e3eb05f5b4c80520d0e940402e *R/sda.R
+b485ff4ab10949e181ff14016b4a9b24 *R/sda.ranking.R
 e0e1cfd67906eac621bdcbb1a12013b9 *data/datalist
 b8eb2908b5008737c3cc1949d0fb00e8 *data/khan2001.rda
 e2f47a0c04fe818492534708d77aa0ed *data/singh2002.rda
@@ -16,5 +16,5 @@ f6efca7306361545bf16526e4a8f68b0 *man/khan2001.Rd
 3d798b473c7dcd513c024ab2cb89433e *man/sda-internal.Rd
 16b7ab7a1a2443ff6ddfe807c3385d2e *man/sda.Rd
 7052b17c8a04e261fc207e982591a70e *man/sda.package.Rd
-46093d1b602d3613012bf876ba8ab061 *man/sda.ranking.Rd
+d12458c3249478b98cfd87ea60d0e114 *man/sda.ranking.Rd
 50ea5d9cb96e82eda8522ca5ab7a3e75 *man/singh2002.Rd

@@ -16,7 +16,8 @@
 sda.ranking(Xtrain, L, lambda, lambda.var, lambda.freqs,
   ranking.score=c("entropy", "avg", "max"), 
   diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
-\method{plot}{sda.ranking}(x, top=40, arrow.col="blue", ...)
+\method{plot}{sda.ranking}(x, top=40, arrow.col="blue", zeroaxis.col="red",
+   ylab="Features", main, ...)
 }
 
 \arguments{
@@ -41,7 +42,10 @@ sda.ranking(Xtrain, L, lambda, lambda.var, lambda.freqs,
   \item{x}{An "sda.ranking" object -- this is produced by the sda.ranking() function.}
   \item{top}{The number of top-ranking features shown in the plot (default: 40).}
   \item{arrow.col}{Color of the arrows in the plot (default is \code{"blue"}).}
-   \item{...}{Additional arguments for generic plot.}
+  \item{zeroaxis.col}{Color for the center zero axis (default is \code{"red"}).}
+  \item{ylab}{Label written next to feature list (default is \code{"Features"}).}
+  \item{main}{Main title (if missing, \code{"The", top, "Top Ranking Features"} is used).}
+  \item{...}{Other options passed on to generic plot().}
 }
 \details{
 For each predictor variable and centroid a shrinkage CAT scores of the mean versus

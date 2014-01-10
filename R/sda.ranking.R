@@ -1,4 +1,4 @@
-### sda.ranking.R  (2013-08-31)
+### sda.ranking.R  (2013-11-21)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
@@ -92,9 +92,10 @@ sda.ranking = function(Xtrain, L, lambda, lambda.var, lambda.freqs,
 }
 
 
-plot.sda.ranking = function(x, top=40, arrow.col="blue", ...) 
+plot.sda.ranking = function(x, top=40, arrow.col="blue", zeroaxis.col="red", 
+  ylab="Features", main, ...)
 {
-  if (class(x) != "sda.ranking") 
+  if (class(x) != "sda.ranking")
   {
     stop("sda.ranking x needed as input!")
   }
@@ -103,18 +104,19 @@ plot.sda.ranking = function(x, top=40, arrow.col="blue", ...)
   diagonal = attr(x, "diagonal")
 
   top = min(nrow(x), top) # just to be sure ...
+  if(missing(main)) main = paste("The", top, "Top Ranking Features")
 
   idx = 2+(1:cl.count)
 
   cn = colnames(x)[idx]
   rn = rownames(x)[1:top]
 
-  if (diagonal) 
+  if (diagonal)
   {
     cn = substr(cn, 3, nchar(cn))
     xlab = "t-Scores (Centroid vs. Pooled Mean)"
-  } 
-  else 
+  }
+  else
   {
     cn = substr(cn, 5, nchar(cn))
     xlab = "Correlation-Adjusted t-Scores (Centroid vs. Pooled Mean)"
@@ -126,35 +128,57 @@ plot.sda.ranking = function(x, top=40, arrow.col="blue", ...)
   }
   else
   {
-    if (any(duplicated(rn))) 
+    if (any(duplicated(rn)))
     {
       warning("There are duplicated row names! These are converted to unique labels in the dotplot.")
       rn = make.unique(rn)
     }
   }
 
+  ## calculate breaks on x-axis
   xBreaks = pretty(range(x[1:top, idx]))
+
+  ## calculate limits (for each subplot)
   dXlim = sum(diff(xBreaks))
   ylim = c(0, top+1)
 
+  ## save current device parameter
   oldPar = par(no.readonly=TRUE)
+  ## and restore them after leaving these function
   on.exit(par(oldPar[c("mar", "mgp", "las", "xaxs", "yaxs")]))
 
-  par(mai=c(0.7, max(strwidth(as.character(rn), units="inches"))+0.25, 0.9,
-            0.25), mgp=c(3, 0.5, 0), las=1, yaxs="i", xaxs="i")
+  ## default character width/height in inch
+  cin = par("cin") * par("mex")
 
+  ## calculate max rowname width for left margin
+  maxRowNameWidth = max(strwidth(as.character(rn), units="inches"))
+  ## calculate margin lines (for title(ylab))
+  lines = round(maxRowNameWidth/cin[2] + (nchar(ylab) > 0))
+  ## left margin: lines+1 (because line counting starts at 0)
+  ## + some additional margin
+  leftMargin = (lines+1)*cin[2] + 0.05
+
+  ## set device geometry
+  par(mai=c(0.7, leftMargin, 0.9, 0.25),
+      mgp=c(3, 0.5, 0), las=1, yaxs="i", xaxs="i")
+
+  ## calculate x-limits by combining all subplots
   fullXlim = c(0, dXlim * cl.count)
 
-  ## plot area
+  ## create empty plot area
   plot(NA, type="n", xaxt="n", yaxt="n", xlim=fullXlim, ylim=ylim,
-       main="", xlab="", ylab="")
+       main="", xlab="", ylab="", ...)
 
   ## title
-  title(main=paste("The", top, "Top Ranking Features"),
-        line=3)
+  title(main=main, line=3)
+
   ## xlab
   title(xlab=xlab, line=2)
 
+  ## ylab
+  title(ylab=ylab, line=lines)
+
+  ## calculate x values for border of subplots and x==0 lines
   xlimLeft = dXlim*(0:(cl.count-1))
   xZero = abs(xBreaks[1]) + xlimLeft
 
@@ -199,7 +223,7 @@ plot.sda.ranking = function(x, top=40, arrow.col="blue", ...)
   abline(h=1:top, col="#808080", lwd=0.25)
 
   ## vertical gray lines
-  abline(v=xZero, col="#808080", lty=3, lwd=0.25)
+  abline(v=xZero, col=zeroaxis.col, lty=3, lwd=0.25)
 
   ## values
   values = x[1:top, idx]
