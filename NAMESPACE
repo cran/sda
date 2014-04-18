@@ -6,3 +6,8 @@ export(
 "sda",
 "sda.ranking"
 )
+import(
+"corpcor", 
+"entropy",
+"fdrtool"
+)
