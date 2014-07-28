@@ -3,6 +3,12 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.3.4
+
+- change of maintainer email address.
+- corrections to index.html file in inst/doc folder.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.3.3
 
 - an import() statement has been added to NAMESPACE to address warnings

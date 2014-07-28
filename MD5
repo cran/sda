@@ -1,6 +1,6 @@
-7171f97d84171072b10f50af951a3f97 *DESCRIPTION
+2b946c59645394d97388df73b7f97284 *DESCRIPTION
 c33945aaf10205db2be98c6089dee98e *NAMESPACE
-1bf6c82829c892db56cedf0559d94cb3 *NEWS
+84c4c8155b8f4121cd82c52ff2271940 *NEWS
 84f16d3321d9705403e6e39d8cb2b6d3 *R/catscore.R
 99b43c34dcc718d8681b01c9211c14ee *R/centroids.R
 40fcd6c579d2a109149d26fc5dfe0d6f *R/predict.sda.R
@@ -9,7 +9,7 @@ b485ff4ab10949e181ff14016b4a9b24 *R/sda.ranking.R
 e0e1cfd67906eac621bdcbb1a12013b9 *data/datalist
 b8eb2908b5008737c3cc1949d0fb00e8 *data/khan2001.rda
 e2f47a0c04fe818492534708d77aa0ed *data/singh2002.rda
-d3dc8e3c045773b74951bf983092c41e *inst/doc/index.html
+cf4c5bbde272f2e32d6edb265bf258c7 *inst/doc/index.html
 a780d762ca5157c21cc4867cfc9bab46 *inst/doc/sda-khan-data.R
 1090ee09b97c5545da10f51479d7d91f *inst/doc/sda-singh-data.R
 20aef20f179f8b1c07e059e0ee2addc0 *man/catscore.Rd
