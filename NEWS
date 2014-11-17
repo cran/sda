@@ -3,6 +3,13 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.3.5
+
+- the example R scripts (Khan SRBCT and Singh prostate cancer data) are 
+  now provided in R notebook format.
+- change of maintainer email address.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.3.4
 
 - change of maintainer email address.

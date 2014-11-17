@@ -10,13 +10,13 @@
 ### It is made available under the terms of the GNU General Public
 ### License, version 3, or at your option, any later version,
 ### incorporated herein by reference.
-### 
+###
 ### This program is distributed in the hope that it will be
 ### useful, but WITHOUT ANY WARRANTY; without even the implied
 ### warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ### PURPOSE.  See the GNU General Public License for more
 ### details.
-### 
+###
 ### You should have received a copy of the GNU General Public
 ### License along with this program; if not, write to the Free
 ### Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
@@ -24,12 +24,12 @@
 
 
 sda.ranking = function(Xtrain, L, lambda, lambda.var, lambda.freqs, 
- ranking.score=c("entropy", "avg", "max"), 
+ ranking.score=c("entropy", "avg", "max"),
  diagonal=FALSE, fdr=TRUE, plot.fdr=FALSE, verbose=TRUE)
 {
   ranking.score = match.arg(ranking.score)
 
-  cat = catscore(Xtrain, L, 
+  cat = catscore(Xtrain, L,
      lambda=lambda, lambda.var=lambda.var, lambda.freqs=lambda.freqs,
       diagonal=diagonal, verbose=verbose)
 
@@ -59,19 +59,19 @@ sda.ranking = function(Xtrain, L, lambda, lambda.var, lambda.freqs,
     else
     {
       z = score^(1/3) # Wilson-Hilferty transformation to normality
-     
+
       # center before feeding into fdrtool
       #offset = median(z)
       d = density(z)
       offset = d$x[which.max(d$y)]
-      z = z-offset 
+      z = z-offset
       fdr.out = fdrtool(z, plot=plot.fdr, verbose=FALSE)
     }
     lfdr = fdr.out$lfdr # local false discovery rates
     pval = fdr.out$pval # p-values
 
     # compute HC score for each p-value
-    HC = hc.score(pval) # function from fdrtool 
+    HC = hc.score(pval) # function from fdrtool
 
     ranking = cbind(idx, score[idx], cat[idx, , drop=FALSE], lfdr[idx], HC[idx])
     colnames(ranking) = c("idx", "score", colnames(cat), "lfdr", "HC")
