@@ -6,6 +6,8 @@ export(
 "sda",
 "sda.ranking"
 )
+S3method("predict", "sda")
+S3method("plot", "sda.ranking")
 import(
 "corpcor", 
 "entropy",

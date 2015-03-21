@@ -31,10 +31,8 @@ and 5 other (non-SRBCT) samples.
 }
 
 \source{
-  The data are described in Khan et al. (2001) and can be
-  obtained from 
-  \url{http://cbbp.thep.lu.se/pub/Preprints/01/lu_tp_01_06_supp.html}. Note that the values in 
-  \code{khan.data$x} are additionally logarithmized (using natural \code{\link[base]{log}}) for normalization.
+  The data are described in Khan et al. (2001). Note that the values in 
+  \code{khan.data$x} are logarithmized (using natural \code{\link[base]{log}}) for normalization.
 }
 
 \references{

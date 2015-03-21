@@ -27,7 +27,7 @@ and 50 healty men.
 
 \source{
   The data are described in Singh et al. (2001) and are provided in exactly the form
-  as used by Efron (2008) - see \url{http://www-stat.stanford.edu/~ckirby/brad/papers/Ebaydata.R}. 
+  as used by Efron (2008). 
 }
 
 \references{
