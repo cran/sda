@@ -8,8 +8,7 @@ export(
 )
 S3method("predict", "sda")
 S3method("plot", "sda.ranking")
-import(
-"corpcor", 
-"entropy",
-"fdrtool"
-)
+import("corpcor", "entropy", "fdrtool")
+import("graphics")
+import("stats")
+import("utils")

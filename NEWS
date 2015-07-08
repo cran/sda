@@ -3,6 +3,11 @@
              ========================================
 
 
+              CHANGES IN `sda' PACKAGE VERSION 1.3.7
+
+- add import statements as required by R-devel.
+
+
               CHANGES IN `sda' PACKAGE VERSION 1.3.6
 
 - fix "S3 generic/method consistency" NOTE raised by R-devel.
