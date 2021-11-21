@@ -9,7 +9,7 @@
    (correlation-adjusted t-scores)
    between the group centroids and the pooled mean.
 
-  \code{plot.sda.ranking} provides a graphical visualization of the top ranking features..
+  \code{plot.sda.ranking} provides a graphical visualization of the top ranking features.
 }
 
 \usage{
@@ -94,18 +94,19 @@ For shrinkage t scores see Opgen-Rhein and Strimmer (2007).
 \references{
 Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
 using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
-Preprint available from \url{http://arxiv.org/abs/0903.2003}.
+<DOI:10.1214/09-AOAS277>
 
 Opgen-Rhein, R., and K. Strimmer. 2007. Accurate ranking of differentially expressed 
 genes by a distribution-free shrinkage approach.  
  Statist. Appl. Genet. Mol. Biol. 6:9.
+<DOI:10.2202/1544-6115.1252>
 
 Zuber, V., and K. Strimmer. 2009.  Gene ranking and biomarker discovery under correlation.
-Bioinformatics 25: 2700-2707.
-Preprint available from \url{http://arxiv.org/abs/0902.0751}.}
+Bioinformatics 25: 2700-2707. <DOI:10.1093/bioinformatics/btp460>
+}
 
 \author{
-  Miika Ahdesm\"aki, Verena Zuber, Sebastian Gibb, and Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miika Ahdesm\"aki, Verena Zuber, Sebastian Gibb, and Korbinian Strimmer (\url{https://strimmerlab.github.io}).
 }
 \seealso{\code{\link{catscore}}, \code{\link{sda}}, \code{\link{predict.sda}}.}
 

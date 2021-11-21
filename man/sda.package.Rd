@@ -30,16 +30,16 @@ the functionality of this package.
 \references{
 Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
 using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
-Preprint available from \url{http://arxiv.org/abs/0903.2003}.
+<DOI:10.1214/09-AOAS277>
 
 Zuber, V., and K. Strimmer. 2009.  Gene ranking and biomarker discovery under correlation.
 Bioinformatics 25: 2700-2707.
-Preprint available from \url{http://arxiv.org/abs/0902.0751}.
+<DOI:10.1093/bioinformatics/btp460>
 
-See website: \url{http://strimmerlab.org/software/sda/}
+See website: \url{https://strimmerlab.github.io/software/sda/}
 }
 
-\author{Miika Ahdesm\"aki, Verena Zuber and Korbinian Strimmer (\url{http://strimmerlab.org/})}
+\author{Miika Ahdesm\"aki, Verena Zuber and Korbinian Strimmer (\url{https://strimmerlab.github.io/})}
 
 \keyword{multivariate}
 \seealso{

@@ -46,7 +46,7 @@ Note that the pooled mean is computed using the estimated frequencies.
 
 
 \author{
-  Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Korbinian Strimmer (\url{https://strimmerlab.github.io}).
 }
 \seealso{
 \code{\link[corpcor:cov.shrink]{var.shrink}}, 

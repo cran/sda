@@ -52,15 +52,15 @@ The scale factors for t-scores and CAT-scores are computed from the estimated fr
 \references{
 Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
 using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
-Preprint available from \url{http://arxiv.org/abs/0903.2003}.
+<DOI:10.1214/09-AOAS277>
 
 Zuber, V., and K. Strimmer. 2009.  Gene ranking and biomarker discovery under correlation.
 Bioinformatics 25: 2700-2707.
-Preprint available from \url{http://arxiv.org/abs/0902.0751}.
+<DOI:10.1093/bioinformatics/btp460>
 }
 
 \author{
- Verena Zuber, Miika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org}).
+ Verena Zuber, Miika Ahdesm\"aki and Korbinian Strimmer (\url{https://strimmerlab.github.io}).
 }
 \seealso{\code{\link{sda.ranking}}, \code{\link[care]{carscore}},.}
 

@@ -57,11 +57,11 @@ are obtained analytically without resorting to computer intensive resampling.
 \references{
 Ahdesm\"aki, A., and K. Strimmer. 2010.  Feature selection in omics prediction problems 
 using cat scores and false non-discovery rate control. Ann. Appl. Stat. 4: 503-519.
-Preprint available from \url{http://arxiv.org/abs/0903.2003}.
+<DOI:10.1214/09-AOAS277>
 }
 
 \author{
-  Miika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miika Ahdesm\"aki and Korbinian Strimmer (\url{https://strimmerlab.github.io}).
 }
 \seealso{\code{\link{predict.sda}}, \code{\link{sda.ranking}},
 \code{\link[entropy:entropy.shrink]{freqs.shrink}}, 
@@ -114,7 +114,7 @@ sum(ynew != Ytest)
 
 #################################################################
 # for complete example scripts illustrating classification with #
-# feature selection visit http://strimmerlab.org/software/sda/  #
+# feature selection visit https://strimmerlab.github.io/software/sda/  #
 #################################################################
 }
 \keyword{multivariate}

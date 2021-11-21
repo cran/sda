@@ -1,6 +1,6 @@
-40b7d03b752d5edcc1b598c3f413bc54 *DESCRIPTION
+132b3bb08a4fd50560a77cb97efd3e40 *DESCRIPTION
 d19983f401cdfd545d18404ed0cc12ee *NAMESPACE
-067cdf350ad01c43c6431ccf7c62d252 *NEWS
+c12124101d41dde57b59ae7bfc16141e *NEWS
 84f16d3321d9705403e6e39d8cb2b6d3 *R/catscore.R
 99b43c34dcc718d8681b01c9211c14ee *R/centroids.R
 40fcd6c579d2a109149d26fc5dfe0d6f *R/predict.sda.R
@@ -12,12 +12,12 @@ e2f47a0c04fe818492534708d77aa0ed *data/singh2002.rda
 5b621687a6e6b403d56bfe464bcb38b9 *inst/doc/index.html
 1d304a35efe7f435619837717742dca6 *inst/doc/sda-khan-data.R
 8b50dd35c80de85d64dab39b6bca223a *inst/doc/sda-singh-data.R
-20aef20f179f8b1c07e059e0ee2addc0 *man/catscore.Rd
-8e3ddf68c67a2ac16954d9650a42d6d0 *man/centroids.Rd
+d65f01ba66dedb3489759dd2af7bc8ff *man/catscore.Rd
+971aba8a6fb373db25ec3a9d47ed764d *man/centroids.Rd
 c93536d269e29f88c267d7d6cb66c7f2 *man/khan2001.Rd
-2329f8eb3aa9fc0420c93b1bc5006f4b *man/predict.sda.Rd
+1cd98c5e83b14bcc032f959e5c70fb19 *man/predict.sda.Rd
 3d798b473c7dcd513c024ab2cb89433e *man/sda-internal.Rd
-16b7ab7a1a2443ff6ddfe807c3385d2e *man/sda.Rd
-7052b17c8a04e261fc207e982591a70e *man/sda.package.Rd
-d12458c3249478b98cfd87ea60d0e114 *man/sda.ranking.Rd
+34cb95ebaa102321d4768914fb81aa05 *man/sda.Rd
+74bc14495169306a81a8b51bc1d5ff55 *man/sda.package.Rd
+833083a7464854ee2b96cde3753465f3 *man/sda.ranking.Rd
 39bd0a3f4fa6fa4591193a8e72719c59 *man/singh2002.Rd

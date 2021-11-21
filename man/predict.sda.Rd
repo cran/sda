@@ -31,7 +31,7 @@
 
 
 \author{
-  Miiika Ahdesm\"aki and Korbinian Strimmer (\url{http://strimmerlab.org}).
+  Miiika Ahdesm\"aki and Korbinian Strimmer (\url{https://strimmerlab.github.io}).
 }
 \seealso{\code{\link{sda}}, \code{\link{sda.ranking}}.}
 
