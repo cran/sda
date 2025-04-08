@@ -32,7 +32,7 @@ sda(Xtrain, L, lambda, lambda.var, lambda.freqs, diagonal=FALSE, verbose=TRUE)
 \details{
 In order to train the LDA or DDA classifier, three separate shrinkage estimators are employed:
 
-\itemize{
+\describe{
  \item{class frequencies:}{ the  estimator \code{\link[entropy:entropy.shrink]{freqs.shrink}} 
            from   Hausser and Strimmer (2008),}
  \item{variances:}{ the estimator \code{\link[corpcor:cov.shrink]{var.shrink}} from Opgen-Rhein and Strimmer (2007),  }

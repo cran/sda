@@ -1,8 +1,8 @@
-### sda.ranking.R  (2013-11-21)
+### sda.ranking.R  (2025-04-08)
 ###
 ###    Shrinkage discriminant analysis (feature ranking)
 ###
-### Copyright 2008-13 Miika Ahdesmaki, Verena Zuber, Sebastian Gibb,
+### Copyright 2008-25 Miika Ahdesmaki, Verena Zuber, Sebastian Gibb,
 ### and Korbinian Strimmer
 ###
 ###
@@ -95,7 +95,8 @@ sda.ranking = function(Xtrain, L, lambda, lambda.var, lambda.freqs,
 plot.sda.ranking = function(x, top=40, arrow.col="blue", zeroaxis.col="red", 
   ylab="Features", main, ...)
 {
-  if (class(x) != "sda.ranking")
+  if ( !inherits(x, "sda.ranking") )
+  #if (class(x) != "sda.ranking")
   {
     stop("sda.ranking x needed as input!")
   }

@@ -1,8 +1,8 @@
-### predict.sda.R  (2013-11-21)
+### predict.sda.R  (2025-04-08)
 ###
 ###    Shrinkage discriminant analysis (prediction)
 ###
-### Copyright 2008-2013 Korbinian Strimmer
+### Copyright 2008-2025 Korbinian Strimmer
 ###
 ###
 ### This file is part of the `sda' library for R and related languages.
@@ -32,6 +32,12 @@ predict.sda = function (object, Xtest, verbose = TRUE, ...)
     }
     if (!is.matrix(Xtest)) 
         stop("Test data must be given as matrix!")
+
+    max.col.value = function(x)
+    {
+      return(x[cbind(1:nrow(x), max.col(x, ties.method="first"))])
+    }
+
     ntest = nrow(Xtest)
 
     alpha = object$alpha
@@ -58,12 +64,5 @@ predict.sda = function (object, Xtest, verbose = TRUE, ...)
     rownames(probs) = rownames(Xtest)
     return(list(class = yhat, posterior = probs))
 }
-
-# by Sebastian Gibb
-max.col.value = function(x)
-{
-  return(x[cbind(1:nrow(x), max.col(x, ties.method="first"))])
-}
-
 
 

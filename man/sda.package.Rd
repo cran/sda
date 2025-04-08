@@ -18,7 +18,7 @@ with correlation among predictors.
 For details see Zuber and Strimmer (2009) and Ahdesm\"aki and Strimmer (2010).
 
 Typically the functions in this package are applied in three steps:
-\itemize{
+\describe{
 \item{Step 1:}{feature selection with \code{\link{sda.ranking}},} 
 \item{Step 2:}{training the classifier with \code{\link{sda}}, and}
 \item{Step 3:}{classification using \code{\link{predict.sda}}.} 
